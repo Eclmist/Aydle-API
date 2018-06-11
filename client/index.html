@@ -1,0 +1,85 @@
+<h1>This page is a mess</h1>
+
+<script type="text/javascript" src = "https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script type="text/javascript" src = "client/ClientSocket.js"></script>
+<script src="//cdn.jsdelivr.net/npm/phaser@3.0.0/dist/phaser.min.js"></script>
+<script type="text/javascript" src = "client/RoomManager.js" ></script>
+<script type="text/javascript" src = "client/GameManager.js" ></script>
+<script type="text/javascript" src = "client/PassTheBomb.js" ></script>
+
+<form>
+		Enter Pin: <input id="pin" type="text" name="pin"><br>
+		<input id="join" type="submit" value="Join">
+		<br><input id="host" type="submit" value="Host">
+		Use name: <input id="name" type="text" name="name"><br>
+		<input id="useName" type="submit" value="UseName">
+		<input id="start" type="submit" value="start">
+	</form>
+
+
+<script>
+
+	var clientSocket = new ClientSocket();
+	var roomManager = new RoomManager(clientSocket);
+	var gameManager = new GameManager(clientSocket);
+
+
+	
+    document.getElementById("start").addEventListener("click", event => {
+
+event.preventDefault();
+gameManager.StartGames();
+clientSocket.GetSocket().emit('enterGame');
+});
+	
+    document.getElementById("host").addEventListener("click", event => {
+
+event.preventDefault();
+roomManager.HostRoom();
+});
+
+
+
+    document.getElementById("join").addEventListener("click", event => {
+
+event.preventDefault();
+
+let temp = document.getElementById("pin").value;
+roomManager.JoinRoom(temp);
+});
+
+
+    document.getElementById("useName").addEventListener("click", event => {
+
+event.preventDefault();
+let name = document.getElementById("name").value;
+roomManager.SetName(name);
+
+});
+
+
+function loadScript(url, callback){
+
+	var script = document.createElement("script")
+	script.type = "text/javascript";
+
+	if (script.readyState){  //IE
+		script.onreadystatechange = function(){
+			if (script.readyState == "loaded" ||
+					script.readyState == "complete"){
+				script.onreadystatechange = null;
+				callback();
+			}
+		};
+	} else {  //Others
+		script.onload = function(){
+			callback();
+		};
+	}
+
+	script.src = url;
+	document.body.appendChild(script);
+}
+
+
+</script>
