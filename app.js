@@ -6,7 +6,7 @@ var app = express();
 var serv = require('http').Server(app);
 
 app.get('/',function(req,res){
-	//res.sendFile(__dirname + '/client/index.html');
+	res.sendFile(__dirname + '/client/index.html');
 	
 });
 
@@ -20,8 +20,7 @@ var PlayerManager = require('games/PlayerManager');
 var playerManager = new PlayerManager();
 
 // setup socket.io
-var io = require('socket.io')(serv,{});
-io.origins(['164.78.250.116']);
+var io = require('socket.io')(serv,{origins : '164.78.250.116'});
 
 io.sockets.on('connection', function(socket)
 {
