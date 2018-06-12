@@ -1,13 +1,14 @@
 // this gonna be filled with server stuff
 
+
 // setup express
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
 
 app.get('/',function(req,res){
-	//res.sendFile(__dirname + '/client/index.html');
-	res.send('hello there!');
+	res.sendFile(__dirname + '/client/index.html');
+	//res.send('hello there!');
 	
 });
 
@@ -16,10 +17,9 @@ app.use('/client', express.static(__dirname + '/client'));
 serv.listen(process.env.PORT || 2000);
 
 var PassTheBombServer = require('games/PassTheBombServer');
-var PlayerManager = require('games/PlayerManager');
+var PlayerManager = require('managers/PlayerManager');
 
 var playerManager = new PlayerManager();
-
 // setup socket.io
 //var io = require('socket.io')(serv,{origins : '164.78.250.116'});
 var io = require('socket.io')(serv,{});
