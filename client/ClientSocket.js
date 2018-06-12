@@ -10,7 +10,7 @@ ClientSocket.prototype.GetSocket = function()
 
 ClientSocket.prototype.InitSocketConnection = function()
 {
-    socket = io('aydle-api.azurewebsites.net');
+    socket = io();
 
     // From now on, all socket handlers go here
 

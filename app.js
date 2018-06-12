@@ -11,7 +11,7 @@ app.get('/',function(req,res){
 	
 });
 
-//app.use('/client', express.static(__dirname + '/client'));
+app.use('/client', express.static(__dirname + '/client'));
 
 serv.listen(process.env.PORT || 2000);
 
@@ -21,7 +21,8 @@ var PlayerManager = require('games/PlayerManager');
 var playerManager = new PlayerManager();
 
 // setup socket.io
-var io = require('socket.io')(serv,{origins : '164.78.250.116'});
+//var io = require('socket.io')(serv,{origins : '164.78.250.116'});
+var io = require('socket.io')(serv,{});
 
 io.sockets.on('connection', function(socket)
 {
