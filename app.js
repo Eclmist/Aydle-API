@@ -16,8 +16,10 @@ app.use('/client', express.static(__dirname + '/client'));
 
 serv.listen(process.env.PORT || 2000);
 
+// require modules
 var PassTheBombServer = require('games/PassTheBombServer');
 var PlayerManager = require('managers/PlayerManager');
+var Player = require('server/Player');
 
 var playerManager = new PlayerManager();
 // setup socket.io
@@ -159,6 +161,13 @@ io.sockets.on('connection', function(socket)
 //=============================== Game Stuff =================================//
 	
 
+	  // tell every other player except himself in the room what game to prepare
+	socket.on('requestAddGame',function(game)
+	{
+		console.log('host has added a game!');
+		let roomCode = GetRoomsByUser(socket.id)[0];
+		socket.broadcast.to(roomCode) .emit('addGame', game);
+	});
 
 	socket.on('requestStartGame',function(data)
 	{
