@@ -20,10 +20,9 @@ serv.listen(process.env.PORT || 2000);
 var PassTheBombServer = require('games/PassTheBombServer');
 var PlayerManager = require('managers/PlayerManager');
 var GameRoom = require('server/GameRoom');
-var Player = require('server/Player');
 
 
-var rooms = {};
+var gamerooms = {};
 var playerManager = new PlayerManager();
 // setup socket.io
 //var io = require('socket.io')(serv,{origins : '164.78.250.116'});
@@ -95,8 +94,9 @@ io.sockets.on('connection', function(socket)
 		socket.leaveAll();
 		socket.join(generatedCode);
 		
-		rooms[generatedCode] = new GameRoom();
-		rooms[generatedCode].AddPlayer(socket.id);
+		gamerooms[generatedCode] = new GameRoom();
+		gamerooms[generatedCode].AddPlayer(socket.id);
+		console.log(gamerooms[generatedCode].GetPlayers());
 		
 
 		socket.emit('onHostCode',
@@ -173,7 +173,7 @@ io.sockets.on('connection', function(socket)
 	{
 		console.log('host has added a game!');
 		let roomCode = GetRoomsByUser(socket.id)[0];
-		socket.broadcast.to(roomCode) .emit('addGame', game);
+		//socket.broadcast.to(roomCode).emit('addGame', game);
 	});
 
 	socket.on('requestStartGame',function(data)
