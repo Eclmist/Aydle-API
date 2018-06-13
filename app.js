@@ -19,8 +19,11 @@ serv.listen(process.env.PORT || 2000);
 // require modules
 var PassTheBombServer = require('games/PassTheBombServer');
 var PlayerManager = require('managers/PlayerManager');
+var GameRoom = require('server/GameRoom');
 var Player = require('server/Player');
 
+
+var rooms = {};
 var playerManager = new PlayerManager();
 // setup socket.io
 //var io = require('socket.io')(serv,{origins : '164.78.250.116'});
@@ -92,6 +95,10 @@ io.sockets.on('connection', function(socket)
 		socket.leaveAll();
 		socket.join(generatedCode);
 		
+		rooms[generatedCode] = new GameRoom();
+		rooms[generatedCode].AddPlayer(socket.id);
+		
+
 		socket.emit('onHostCode',
 		{
 			generatedCode : generatedCode
