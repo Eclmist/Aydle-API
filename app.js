@@ -49,8 +49,12 @@ io.sockets.on('connection', function(socket)
 	socket.on('disconnecting',function(reason)
 	{
 		let code = GetRoomsByUser(socket.id)[0];
+
 		playerManager.RemovePlayer(socket.id);
 		io.to(code).emit('disconnect',socket.id);
+
+		gamerooms[code].RemovePlayer(socket.id);
+
 		
 	});
 
@@ -71,8 +75,11 @@ io.sockets.on('connection', function(socket)
 		{
 			socket.leaveAll();
 			socket.join(data.code);
+
+			gamerooms[data.code].AddPlayer(socket.id);
+
 			socket.emit('onJoin');
-			console.log(io.sockets.adapter.rooms);
+			console.log(gamerooms[data.code].GetPlayers());
 		}
 		else
 		{
