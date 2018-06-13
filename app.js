@@ -18,12 +18,10 @@ serv.listen(process.env.PORT || 2000);
 
 // require modules
 var PassTheBombServer = require('games/PassTheBombServer');
-var PlayerManager = require('managers/PlayerManager');
 var GameRoom = require('server/GameRoom');
 
 
 var gamerooms = {};
-var playerManager = new PlayerManager();
 // setup socket.io
 //var io = require('socket.io')(serv,{origins : '164.78.250.116'});
 var io = require('socket.io')(serv,{});
@@ -48,14 +46,27 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('disconnecting',function(reason)
 	{
-		let code = GetRoomsByUser(socket.id)[0];
+		let tempRooms = GetRoomsByUser(socket.id)
 
-		playerManager.RemovePlayer(socket.id);
-		io.to(code).emit('disconnect',socket.id);
+		if(tempRooms !== undefined)
+		{
+			let code = GetRoomsByUser(socket.id)[0];
+			
+			if(gamerooms)
+			{
+				if(gamerooms[code])
+				{
+					gamerooms[code].RemovePlayer(socket.id);
+				}			
+			}			
 
-		gamerooms[code].RemovePlayer(socket.id);
+			io.to(code).emit('disconnect',socket.id);
 
-		
+		}
+		else
+		{
+			console.log("works great");
+		}
 	});
 
 	// just a test function
@@ -128,52 +139,16 @@ io.sockets.on('connection', function(socket)
 		});
 	});
 
-	socket.on('enterGame', function(data)
-	{
-		// for now initilize the player as he joins the room
-		// dont allow same player to join
-		let addedBefore = false;
-		let players = playerManager.GetPlayers();
-
-		Object.keys(players).forEach(function (id)
-		{
-			
-			if (players[id].playerID === socket.id)
-			{
-			  addedBefore = true;
-			}
-		});
-
-		if(!addedBefore)
-		{
-			console.log('adding');
-			playerManager.AddPlayer(socket.id);
-			
-			// send the list of players to the new player
-			socket.emit('currentPlayers', playerManager.GetPlayers());
-			// update all other players of the new player
-			let roomCode = GetRoomsByUser(socket.id)[0];
-			socket.broadcast.to(roomCode).emit('newPlayer', playerManager.GetPlayer(socket.id));
-		}
-
-	});
-
-
-	// when a player moves, update the player data
-	socket.on('playerMovement', function (movementData) {
-		let movingPlayer = playerManager.GetPlayer(socket.id);
-		let roomCode = GetRoomsByUser(socket.id)[0];
-		
-		movingPlayer.x = movementData.x;
-		movingPlayer.y = movementData.y;
-		movingPlayer.rotation = movementData.rotation;
-
-		// emit a message to all players about the player that moved
-		socket.broadcast.to(roomCode).emit('playerMoved', movingPlayer);
-  	});
 	
 //=============================== Game Stuff =================================//
 	
+
+	socket.on('enterGame', function(data)
+	{
+
+		
+
+	});
 
 	  // tell every other player except himself in the room what game to prepare
 	socket.on('requestAddGame',function(game)
