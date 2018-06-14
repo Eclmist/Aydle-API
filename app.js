@@ -21,6 +21,8 @@ var PassTheBombServer = require('games/PassTheBombServer');
 var GameRoom = require('server/GameRoom');
 var RoomUtils = require('server/RoomUtils');
 
+
+
 var gamerooms = {};
 
 // setup socket.io
@@ -111,11 +113,16 @@ io.sockets.on('connection', function(socket)
 		socket.leaveAll();
 		socket.join(generatedCode);
 		
+		//////////// TO DO ///////////////
+		let createdRoom = 
 		
-		let createdRoom = CreateRoom();
-		createdRoom.players.push();
-		gamerooms[generatedCode] 
+		gamerooms[generatedCode] =
 		
+
+
+
+
+
 
 
 		
