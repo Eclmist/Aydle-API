@@ -230,9 +230,18 @@ function CheckForEmptyRooms()
 	{
 		Object.keys(gamerooms).forEach(function(code)
 		{
-			console.log('room ' + code);
-			console.log(gamerooms[code].players);
+			// if there are no players in the room
+			if(gamerooms[code].players.length < 1)
+			{
+				console.log('deleting empty room');
+				delete gamerooms[code];
+				
+			}
+			
 		});
+
+		
+		console.log(gamerooms);
 
 	}
 
