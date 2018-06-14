@@ -59,6 +59,7 @@ io.sockets.on('connection', function(socket)
 				if(gamerooms[code])
 				{
 					gamerooms[code].RemovePlayer(socket.id);
+					CheckForEmptyRooms();
 				}			
 			}	 		
 
@@ -80,7 +81,6 @@ io.sockets.on('connection', function(socket)
 	socket.on('requestJoin',function(data)
 	{
 		console.log('joing room ' + data.code + '.....');
-
 		
 		if(IsRoomAvailable(data.code))
 		{
@@ -90,7 +90,6 @@ io.sockets.on('connection', function(socket)
 			gamerooms[data.code].AddPlayer(socket.id);
 
 			socket.emit('onJoin');
-			console.log(gamerooms[data.code].GetPlayers());
 		}
 		else
 		{
@@ -112,21 +111,10 @@ io.sockets.on('connection', function(socket)
 		socket.leaveAll();
 		socket.join(generatedCode);
 		
-		//////////// TO DO ///////////////
-		let createdRoom = 
+		let createdRoom = RoomUtils.CreateRoom();
+		createdRoom.AddPlayer(socket.id);
 		
-		gamerooms[generatedCode] =
-		
-
-
-
-
-
-
-
-		
-		CheckForEmptyRooms();
-		
+		gamerooms[generatedCode] = createdRoom;
 
 		socket.emit('onHostCode',
 		{
@@ -141,7 +129,6 @@ io.sockets.on('connection', function(socket)
 		let roomCode = GetRoomsByUser(socket.id)[0];
 		console.log('entering room '+ roomCode +' as ' + data.name);
 		let nameOfClient = data.name;
-		
 
 		socket.broadcast.to(roomCode).emit('notifyJoin',
 		{
@@ -243,7 +230,8 @@ function CheckForEmptyRooms()
 	{
 		Object.keys(gamerooms).forEach(function(code)
 		{
-			console.log(gamerooms[code].GetPlayers());
+			console.log('room ' + code);
+			console.log(gamerooms[code].players);
 		});
 
 	}
