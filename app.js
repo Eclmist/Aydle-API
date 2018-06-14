@@ -19,9 +19,10 @@ serv.listen(process.env.PORT || 2000);
 // require modules
 var PassTheBombServer = require('games/PassTheBombServer');
 var GameRoom = require('server/GameRoom');
-
+var RoomUtils = require('server/RoomUtils');
 
 var gamerooms = {};
+
 // setup socket.io
 //var io = require('socket.io')(serv,{origins : '164.78.250.116'});
 var io = require('socket.io')(serv,{});
@@ -46,7 +47,7 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('disconnecting',function(reason)
 	{
-		let tempRooms = GetRoomsByUser(socket.id)
+		 let tempRooms = GetRoomsByUser(socket.id)
 
 		if(tempRooms !== undefined)
 		{
@@ -58,15 +59,13 @@ io.sockets.on('connection', function(socket)
 				{
 					gamerooms[code].RemovePlayer(socket.id);
 				}			
-			}			
+			}	 		
 
+			
 			io.to(code).emit('disconnect',socket.id);
 
 		}
-		else
-		{
-			console.log("works great");
-		}
+
 	});
 
 	// just a test function
@@ -112,9 +111,15 @@ io.sockets.on('connection', function(socket)
 		socket.leaveAll();
 		socket.join(generatedCode);
 		
-		gamerooms[generatedCode] = new GameRoom();
-		gamerooms[generatedCode].AddPlayer(socket.id);
-		console.log(gamerooms[generatedCode].GetPlayers());
+		
+		let createdRoom = CreateRoom();
+		createdRoom.players.push();
+		gamerooms[generatedCode] 
+		
+
+
+		
+		CheckForEmptyRooms();
 		
 
 		socket.emit('onHostCode',
@@ -220,4 +225,21 @@ function GenerateUniqueCode(codeCount) {
 	 
 
 	 return code;
+}
+
+
+
+// check for rooms with no players and delete them
+function CheckForEmptyRooms()
+{
+
+	if(gamerooms)
+	{
+		Object.keys(gamerooms).forEach(function(code)
+		{
+			console.log(gamerooms[code].GetPlayers());
+		});
+
+	}
+
 }
