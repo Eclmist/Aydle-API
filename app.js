@@ -18,7 +18,6 @@ serv.listen(process.env.PORT || 2000);
 
 // require modules
 var PassTheBombServer = require('games/PassTheBombServer');
-var GameRoom = require('server/GameRoom');
 var RoomUtils = require('server/RoomUtils');
 
 
