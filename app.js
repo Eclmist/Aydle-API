@@ -32,13 +32,16 @@ io.sockets.on('connection', function(socket)
 {
 	console.log('a client connected');
 
-	// Pass the socket reference to all the game servers
+	// Pass the socket reference to all the game servers here ---------------------------//
 	PassTheBombServer.Init(socket);
+
+
+
+	//-----------------------------------------------------------------------------------//
 
 
 	// Set up all server handlers here
 	socket.emit('onConnected');
-
 	
 	socket.on('disconnect', function(socket)
 	{
@@ -48,7 +51,7 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('disconnecting',function(reason)
 	{
-		 let tempRooms = GetRoomsByUser(socket.id)
+		let tempRooms = GetRoomsByUser(socket.id)
 
 		if(tempRooms !== undefined)
 		{
@@ -63,11 +66,8 @@ io.sockets.on('connection', function(socket)
 				}			
 			}	 		
 
-			
 			io.to(code).emit('disconnect',socket.id);
-
 		}
-
 	});
 
 	// just a test function
@@ -75,7 +75,6 @@ io.sockets.on('connection', function(socket)
 	{
 		console.log(GetRoomsByUser(socket.id));
 	});
-
 
 	// route the user to another socket channel
 	socket.on('requestJoin',function(data)
@@ -90,19 +89,19 @@ io.sockets.on('connection', function(socket)
 			gamerooms[data.code].AddPlayer(socket.id);
 
 			socket.emit('onJoin');
+			// give information about the room to the new player that joined
+			console.log(gamerooms[data.code].games);
+			socket.emit('getGameList',gamerooms[data.code]);
 		}
 		else
 		{
 			socket.emit('onJoinFail');
 			socket.disconnect();
-		}
-		
+		}	
 	});
-
 
 	socket.on('requestHost',function(data)
 	{
-
 		console.log('hosting room...');
 		let generatedCode = GenerateUniqueCode(4);
 		console.log('host created room ' + generatedCode);
@@ -111,16 +110,15 @@ io.sockets.on('connection', function(socket)
 		socket.leaveAll();
 		socket.join(generatedCode);
 		
+		// create the room object
 		let createdRoom = RoomUtils.CreateRoom();
 		createdRoom.AddPlayer(socket.id);
-		
 		gamerooms[generatedCode] = createdRoom;
 
 		socket.emit('onHostCode',
 		{
 			generatedCode : generatedCode
 		});
-
 	});
 
 
@@ -137,7 +135,6 @@ io.sockets.on('connection', function(socket)
 		});
 	});
 
-	
 //=============================== Game Stuff =================================//
 	
 
@@ -149,15 +146,18 @@ io.sockets.on('connection', function(socket)
 	});
 
 	  // tell every other player except himself in the room what game to prepare
-	socket.on('requestAddGame',function(game)
+	socket.on('requestAddGame',function(gameref)
 	{
 		console.log('host has added a game!');
-		let roomCode = GetRoomsByUser(socket.id)[0];
-		//socket.broadcast.to(roomCode).emit('addGame', game);
+		let roomCode = GetRoomUserIsIn(socket.id);
+
+		if(roomCode)
+			gamerooms[roomCode].games.push(gameref);
 	});
 
+
 	socket.on('requestStartGame',function(data)
-	{
+	{	
 
 	});
 
@@ -179,8 +179,20 @@ function IsRoomAvailable(code)
 	return false;
 }
 
+// returns the code for the room that the player joined
+function GetRoomUserIsIn(id)
+{
+	let userRooms = GetRoomsByUser(id);
 
-function GetRoomsByUser(id){
+	if(userRooms.length > 0)
+		return userRooms[0];
+	else
+		return null;
+
+}
+
+function GetRoomsByUser(id)
+{
     let usersRooms = [];
     let rooms = io.sockets.adapter.rooms;
 
@@ -200,9 +212,9 @@ function GetRoomsByUser(id){
 
 const legalCharacters = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-function GenerateUniqueCode(codeCount) {
+function GenerateUniqueCode(codeCount) 
+{
   let code = "";
-
 
   for (let i = 0; i < codeCount; i++)
     code += legalCharacters.charAt(Math.floor(Math.random() * legalCharacters.length));
@@ -214,8 +226,7 @@ function GenerateUniqueCode(codeCount) {
 		 {
 			GenerateUniqueCode(codeCount);
 		 }
-	 }
-	 
+	 } 
 
 	 return code;
 }
@@ -225,7 +236,6 @@ function GenerateUniqueCode(codeCount) {
 // check for rooms with no players and delete them
 function CheckForEmptyRooms()
 {
-
 	if(gamerooms)
 	{
 		Object.keys(gamerooms).forEach(function(code)
@@ -235,14 +245,10 @@ function CheckForEmptyRooms()
 			{
 				console.log('deleting empty room');
 				delete gamerooms[code];
-				
 			}
 			
 		});
-
 		
 		console.log(gamerooms);
-
 	}
-
 }
