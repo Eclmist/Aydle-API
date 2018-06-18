@@ -1,5 +1,3 @@
-// this gonna be filled with server stuff
-
 
 // setup express
 var express = require('express');
@@ -231,6 +229,10 @@ function GenerateUniqueCode(codeCount)
 	 return code;
 }
 
+function say()
+{
+	console.log('saying....');
+}
 
 
 // check for rooms with no players and delete them
