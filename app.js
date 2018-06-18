@@ -19,7 +19,6 @@ var PassTheBombServer = require('games/PassTheBombServer');
 var RoomUtils = require('server/RoomUtils');
 
 
-
 var gamerooms = {};
 
 // setup socket.io
@@ -85,6 +84,8 @@ io.sockets.on('connection', function(socket)
 			socket.join(data.code);
 
 			gamerooms[data.code].AddPlayer(socket.id);
+			// store the room object in the socket object
+			socket.currentRoom = gamerooms[data.code];
 
 			socket.emit('onJoin');
 			// give information about the room to the new player that joined
@@ -109,9 +110,11 @@ io.sockets.on('connection', function(socket)
 		socket.join(generatedCode);
 		
 		// create the room object
-		let createdRoom = RoomUtils.CreateRoom();
+		let createdRoom = RoomUtils.CreateRoom(generatedCode);
 		createdRoom.AddPlayer(socket.id);
 		gamerooms[generatedCode] = createdRoom;
+		// store the room object in the socket object
+		socket.currentRoom = gamerooms[generatedCode];
 
 		socket.emit('onHostCode',
 		{
@@ -227,11 +230,6 @@ function GenerateUniqueCode(codeCount)
 	 } 
 
 	 return code;
-}
-
-function say()
-{
-	console.log('saying....');
 }
 
 
