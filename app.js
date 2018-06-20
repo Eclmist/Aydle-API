@@ -30,7 +30,7 @@ io.sockets.on('connection', function(socket)
 	console.log('a client connected');
 
 	// Pass the socket reference to all the game servers here ---------------------------//
-	PassTheBombServer.Init(socket);
+	PassTheBombServer.Init(io,socket);
 
 
 
@@ -137,14 +137,6 @@ io.sockets.on('connection', function(socket)
 	});
 
 //=============================== Game Stuff =================================//
-	
-
-	socket.on('enterGame', function(data)
-	{
-
-		
-
-	});
 
 	  // tell every other player except himself in the room what game to prepare
 	socket.on('requestAddGame',function(gameref)
@@ -157,9 +149,9 @@ io.sockets.on('connection', function(socket)
 	});
 
 
-	socket.on('requestStartGame',function(data)
+	socket.on('requestStartGames',function(data)
 	{	
-
+		socket.currentRoom.games.reverse();
 	});
 
 //=============================== END Game Stuff =============================//
