@@ -48,12 +48,12 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('disconnecting',function(reason)
 	{
-		let tempRooms = GetRoomsByUser(socket.id)
-
-		if(tempRooms !== undefined)
+		// check for room property
+		// socket may not have the room object attached if disconnect fires upon join/host failure
+		if('currentRoom' in socket)
 		{
-			let code = GetRoomsByUser(socket.id)[0];
-			
+			let code = socket.currentRoom.code;
+
 			if(gamerooms)
 			{
 				if(gamerooms[code])
@@ -64,7 +64,9 @@ io.sockets.on('connection', function(socket)
 			}	 		
 
 			io.to(code).emit('disconnect',socket.id);
+
 		}
+
 	});
 
 	// route the user to another socket channel
@@ -117,7 +119,7 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('enterRoomAs',function(name)
 	{
-		let roomCode = GetRoomsByUser(socket.id)[0];
+		let roomCode = socket.currentRoom.code;
 		console.log('entering room '+ roomCode +' as ' + name);
 
 		socket.currentRoom.players.forEach(element => {
@@ -125,9 +127,7 @@ io.sockets.on('connection', function(socket)
 				element.name = name;
 		});
 
-		let nameOfClient = name;
-
-		socket.broadcast.to(roomCode).emit('notifyJoin',nameOfClient,roomCode);
+		socket.broadcast.to(roomCode).emit('notifyJoin',name,roomCode);
 	});
 
 //=============================== Game Stuff =================================//
@@ -136,7 +136,8 @@ io.sockets.on('connection', function(socket)
 	socket.on('requestAddGame',function(gameref)
 	{
 		console.log('host has added a game!');
-		let roomCode = GetRoomUserIsIn(socket.id);
+		let roomCode = socket.currentRoom.code;
+		
 
 		if(roomCode)
 			gamerooms[roomCode].games.push(gameref);
