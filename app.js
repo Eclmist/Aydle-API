@@ -94,7 +94,7 @@ io.sockets.on('connection', function(socket)
 		}	
 	});
 
-	socket.on('requestHost',function(data)
+	socket.on('requestHost',function()
 	{
 		console.log('hosting room...');
 		let generatedCode = GenerateUniqueCode(4);
@@ -111,10 +111,7 @@ io.sockets.on('connection', function(socket)
 		// store the room object in the socket object
 		socket.currentRoom = gamerooms[generatedCode];
 
-		socket.emit('onHostCode',
-		{
-			generatedCode : generatedCode
-		});
+		socket.emit('onHostCode',generatedCode);
 	});
 
 
@@ -130,11 +127,7 @@ io.sockets.on('connection', function(socket)
 
 		let nameOfClient = name;
 
-		socket.broadcast.to(roomCode).emit('notifyJoin',
-		{
-			nameOfClient :  nameOfClient,
-			roomCode : roomCode
-		});
+		socket.broadcast.to(roomCode).emit('notifyJoin',nameOfClient,roomCode);
 	});
 
 //=============================== Game Stuff =================================//
@@ -150,7 +143,7 @@ io.sockets.on('connection', function(socket)
 	});
 
 
-	socket.on('requestStartGames',function(data)
+	socket.on('requestStartGames',function()
 	{	
 		socket.currentRoom.games.reverse();
 	});
