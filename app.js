@@ -67,30 +67,25 @@ io.sockets.on('connection', function(socket)
 		}
 	});
 
-	// just a test function
-	socket.on('doserverstuff',function(data)
-	{
-		console.log(GetRoomsByUser(socket.id));
-	});
-
 	// route the user to another socket channel
-	socket.on('requestJoin',function(data)
+	socket.on('requestJoin',function(code)
 	{
-		console.log('joing room ' + data.code + '.....');
+		console.log('joing room ' + code + '.....');
 		
-		if(IsRoomAvailable(data.code))
+		if(IsRoomAvailable(code))
 		{
 			socket.leaveAll();
-			socket.join(data.code);
+			socket.join(code);
 
-			gamerooms[data.code].AddPlayer(socket.id);
+			gamerooms[code].AddPlayer(socket.id);
 			// store the room object in the socket object
-			socket.currentRoom = gamerooms[data.code];
+			socket.currentRoom = gamerooms[code];
 
-			socket.emit('onJoin');
+			let playerSelf = socket.currentRoom.GetPlayerByID(socket.id);
+
 			// give information about the room to the new player that joined
-			console.log(gamerooms[data.code].games);
-			socket.emit('getGameList',gamerooms[data.code]);
+			socket.emit('onJoin',socket.currentRoom.players,playerSelf);
+			socket.emit('getGameList',socket.currentRoom);
 		}
 		else
 		{
@@ -123,11 +118,17 @@ io.sockets.on('connection', function(socket)
 	});
 
 
-	socket.on('enterRoomAs',function(data)
+	socket.on('enterRoomAs',function(name)
 	{
 		let roomCode = GetRoomsByUser(socket.id)[0];
-		console.log('entering room '+ roomCode +' as ' + data.name);
-		let nameOfClient = data.name;
+		console.log('entering room '+ roomCode +' as ' + name);
+
+		socket.currentRoom.players.forEach(element => {
+			if(element.playerID === socket.id)
+				element.name = name;
+		});
+
+		let nameOfClient = name;
 
 		socket.broadcast.to(roomCode).emit('notifyJoin',
 		{
