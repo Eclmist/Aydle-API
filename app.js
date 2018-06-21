@@ -18,7 +18,7 @@ serv.listen(process.env.PORT || 2000);
 var PassTheBombServer = require('games/PassTheBombServer');
 var RoomUtils = require('server/RoomUtils');
 
-
+// store a reference to all game rooms so we can access it without the socket's reference
 var gamerooms = {};
 
 // setup socket.io
@@ -52,21 +52,12 @@ io.sockets.on('connection', function(socket)
 		// socket may not have the room object attached if disconnect fires upon join/host failure
 		if('currentRoom' in socket)
 		{
-			let code = socket.currentRoom.code;
+			socket.currentRoom.RemovePlayer(socket.id);
+			CheckForEmptyRooms();
 
-			if(gamerooms)
-			{
-				if(gamerooms[code])
-				{
-					gamerooms[code].RemovePlayer(socket.id);
-					CheckForEmptyRooms();
-				}			
-			}	 		
-
-			io.to(code).emit('disconnect',socket.id);
-
+			// this line needs revision ***
+			io.to(socket.currentRoom.code).emit('disconnect',socket.id);
 		}
-
 	});
 
 	// route the user to another socket channel
@@ -85,7 +76,7 @@ io.sockets.on('connection', function(socket)
 
 			let playerSelf = socket.currentRoom.GetPlayerByID(socket.id);
 
-			// give information about the room to the new player that joined
+			// give information about the room(games/players etc...) to the new player that joined
 			socket.emit('onJoin',socket.currentRoom.players,playerSelf);
 			socket.emit('getGameList',socket.currentRoom);
 		}
@@ -111,7 +102,7 @@ io.sockets.on('connection', function(socket)
 		createdRoom.AddPlayer(socket.id);
 		gamerooms[generatedCode] = createdRoom;
 		// store the room object in the socket object
-		socket.currentRoom = gamerooms[generatedCode];
+		socket.currentRoom = createdRoom;
 
 		socket.emit('onHostCode',generatedCode);
 	});
@@ -136,11 +127,7 @@ io.sockets.on('connection', function(socket)
 	socket.on('requestAddGame',function(gameref)
 	{
 		console.log('host has added a game!');
-		let roomCode = socket.currentRoom.code;
-		
-
-		if(roomCode)
-			gamerooms[roomCode].games.push(gameref);
+		socket.currentRoom.games.push(gameref);
 	});
 
 
