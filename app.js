@@ -78,7 +78,7 @@ io.sockets.on('connection', function(socket)
 
 			// give information about the room(games/players etc...) to the new player that joined
 			socket.emit('onJoin',socket.currentRoom.players,playerSelf);
-			socket.emit('getGameList',socket.currentRoom);
+			socket.emit('updateGameList',socket.currentRoom.games);
 		}
 		else
 		{
@@ -123,11 +123,12 @@ io.sockets.on('connection', function(socket)
 
 //=============================== Game Stuff =================================//
 
-	  // tell every other player except himself in the room what game to prepare
-	socket.on('requestAddGame',function(gameref)
+	// update every other player's game list
+	socket.on('notifyAddGame',function(newestGameList)
 	{
-		console.log('host has added a game!');
-		socket.currentRoom.games.push(gameref);
+		// store the games in the room object
+		socket.currentRoom.games = newestGameList;
+		socket.to(socket.currentRoom.code).emit('updateGameList', newestGameList);
 	});
 
 
