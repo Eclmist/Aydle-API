@@ -136,6 +136,7 @@ io.sockets.on('connection', function(socket)
 	socket.on('requestStartGames',function()
 	{	
 		socket.currentRoom.games.reverse();
+		socket.currentRoom.isPlaying = true;
 	});
 
 //=============================== END Game Stuff =============================//
@@ -150,11 +151,17 @@ function IsRoomAvailable(code)
 	for(let room in rooms) 
 	{
 		if(room == code)
-			return true;
+		{
+			if(!gamerooms[code].isPlaying)
+				return true;
+		}
+			
 	}
 
 	return false;
 }
+
+
 
 // returns the code for the room that the player joined
 function GetRoomUserIsIn(id)
