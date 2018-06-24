@@ -22,8 +22,9 @@ var RoomUtils = require('server/RoomUtils');
 var gamerooms = {};
 
 // setup socket.io
-//var io = require('socket.io')(serv,{origins : '164.78.250.116'});
 var io = require('socket.io')(serv,{});
+// set allowed origins
+//io.origins(["175.156.162.3:2000"]);
 
 io.sockets.on('connection', function(socket)
 {
