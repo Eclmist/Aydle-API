@@ -8,7 +8,7 @@ app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
 	res.send('Error 404');
 	
-});
+});			
 
 app.use('/client', express.static(__dirname + '/client'));
 
