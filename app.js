@@ -70,7 +70,7 @@ io.sockets.on('connection', function(socket)
 	});
 
 	// route the user to another socket channel
-	socket.on('requestJoin',function(code)
+	socket.on('requestJoin',function(code,playerID)
 	{
 		console.log('joing room ' + code + '.....');
 		
@@ -79,14 +79,12 @@ io.sockets.on('connection', function(socket)
 			socket.leaveAll();
 			socket.join(code);
 
-			gamerooms[code].AddPlayer(socket.id);
+			gamerooms[code].AddPlayer(socket.id,playerID);
 			// store the room object in the socket object
 			socket.currentRoom = gamerooms[code];
 
-			let playerSelf = socket.currentRoom.GetPlayerByID(socket.id);
-
 			// give information about the room(games/players etc...) to the new player that joined
-			socket.emit('onJoin',socket.currentRoom.players,playerSelf);
+			socket.emit('onJoin',socket.currentRoom);
 			socket.emit('updateGameList',socket.currentRoom.games);
 		}
 		else
@@ -96,7 +94,7 @@ io.sockets.on('connection', function(socket)
 		}	
 	});
 
-	socket.on('requestHost',function()
+	socket.on('requestHost',function(playerID)
 	{
 		console.log('hosting room...');
 		let generatedCode = GenerateUniqueCode(4);
@@ -108,26 +106,30 @@ io.sockets.on('connection', function(socket)
 		
 		// create the room object
 		let createdRoom = RoomUtils.CreateRoom(generatedCode);
-		createdRoom.AddPlayer(socket.id);
+		createdRoom.AddPlayer(socket.id,playerID);
 		gamerooms[generatedCode] = createdRoom;
 		// store the room object in the socket object
 		socket.currentRoom = createdRoom;
 
-		socket.emit('onHostCode',generatedCode);
+		socket.emit('onHostCode',createdRoom);
 	});
 
 
 	socket.on('enterRoomAs',function(name)
 	{
-		let roomCode = socket.currentRoom.code;
-		console.log('entering room '+ roomCode +' as ' + name);
+		let playerThatChangedName;
 
-		socket.currentRoom.players.forEach(element => {
-			if(element.playerID === socket.id)
-				element.name = name;
-		});
+		for(let i = 0; i < socket.currentRoom.players.length; i++)
+		{
+			if(players[i].socketID === socket.id)
+			{
+				player[i].name = name;
+				playerThatChangedName = players[i];
+				break;
+			}
+		}
 
-		socket.broadcast.to(roomCode).emit('notifyJoin',name,roomCode);
+		socket.broadcast.to(roomCode).emit('notifyJoin',playerThatChangedName);
 	});
 
 //=============================== Game Stuff =================================//
