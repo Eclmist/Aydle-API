@@ -5,10 +5,18 @@ var app = express();
 var serv = require('http').Server(app);
 
 app.get('/',function(req,res){
-	//res.sendFile(__dirname + '/client/index.html');
-	res.send('Error 404');
-	
-});			
+	res.sendFile(__dirname + '/client/index.html');
+});	
+
+app.get('/room/:id', function(req,res)
+{
+	let result = IsRoomAvailable(req.params.id)
+	res.send({result:result});
+});
+
+
+
+
 
 app.use('/client', express.static(__dirname + '/client'));
 
