@@ -10,9 +10,32 @@ app.get('/',function(req,res){
 
 app.get('/room/:id', function(req,res)
 {
-	let result = IsRoomAvailable(req.params.id)
+  let result = false;
+  let code = req.params.id;
+
+  if(RoomExist(req.params.id))
+  {
+    if(CanJoinRoom(gamerooms[code]))
+    {
+      result = true;
+    }
+  }
+
 	res.send({result:result});
 });
+
+app.get('/dummy/:id', function(req,res)
+{
+  let code = req.params.id;
+  let success = CreateDebugRoom(code);
+  if(success)
+    res.send('dummy room with code '+ code + ' created.');
+  else
+    res.send('room ' + code + ' already exist try another code');
+  
+  
+});
+
 
 
 
@@ -73,25 +96,32 @@ io.sockets.on('connection', function(socket)
 	socket.on('requestJoin',function(code,playerID)
 	{
 		console.log('joing room ' + code + '.....');
-		
-		if(IsRoomAvailable(code))
-		{
-			socket.leaveAll();
-			socket.join(code);
+    
+    let room = gamerooms[code];
+    
+    if(room !== undefined)
+    {
+      if(CanJoinRoom(room))
+      {
+        socket.leaveAll();
+			  socket.join(code);
 
-			gamerooms[code].AddPlayer(socket.id,playerID);
-			// store the room object in the socket object
-			socket.currentRoom = gamerooms[code];
+			  room.AddPlayer(socket.id,playerID);
+			  // store the room object in the socket object
+			  socket.currentRoom = room;
 
-			// give information about the room(games/players etc...) to the new player that joined
-			socket.emit('onJoin',socket.currentRoom);
-			socket.emit('updateGameList',socket.currentRoom.games);
-		}
-		else
-		{
-			socket.emit('onJoinFail');
+			  // give information about the room(games/players etc...) to the new player that joined
+			  socket.emit('onJoin',socket.currentRoom);
+        socket.emit('updateGameList',socket.currentRoom.games);  
+        console.log(room.players);
+      }
+    }
+    else
+    {
+      socket.emit('onJoinFail');
 			socket.disconnect();
-		}	
+    }
+
 	});
 
 	socket.on('requestHost',function(playerID)
@@ -153,22 +183,27 @@ io.sockets.on('connection', function(socket)
 
 });
 
-
-function IsRoomAvailable(code)
+function RoomExist(code)
 {
-	let rooms = io.sockets.adapter.rooms;
+  return gamerooms[code] !== undefined;
+}
 
-	for(let room in rooms) 
+function CanJoinRoom(room)
+{
+  return !room.isPlaying;
+}
+
+function CreateDebugRoom(code)
+{
+	if(!RoomExist(code))
 	{
-		if(room == code)
-		{
-			if(!gamerooms[code].isPlaying)
-				return true;
-		}
-			
-	}
-
-	return false;
+    let createdRoom = RoomUtils.CreateRoom(code);
+    createdRoom.AddPlayer('dummySocketID','dummyPlayerID');
+    gamerooms[code] = createdRoom;
+    return true;
+  }
+  
+  return false;
 }
 
 
