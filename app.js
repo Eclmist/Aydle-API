@@ -32,8 +32,13 @@ app.get('/dummy/:id', function(req,res)
     res.send('dummy room with code '+ code + ' created.');
   else
     res.send('room ' + code + ' already exist try another code');
-  
-  
+
+});
+
+app.get('/clear', function(req,res)
+{
+  DeleteDummyRooms();
+  res.send('all dummy rooms deleted.');
 });
 
 
@@ -198,12 +203,27 @@ function CreateDebugRoom(code)
 	if(!RoomExist(code))
 	{
     let createdRoom = RoomUtils.CreateRoom(code);
-    createdRoom.AddPlayer('dummySocketID','dummyPlayerID');
+    createdRoom.AddPlayer('dummy','dummy');
     gamerooms[code] = createdRoom;
     return true;
   }
   
   return false;
+}
+
+function DeleteDummyRooms()
+{
+  Object.keys(gamerooms).forEach(function(code)
+		{
+			// if there are no players in the room
+      if(gamerooms[code].players[0].socketID === 'dummy'
+        && gamerooms[code].players[0].playerID === 'dummy')
+			{
+				console.log('deleting dummy rooms');
+				delete gamerooms[code];
+			}
+			
+		});
 }
 
 
