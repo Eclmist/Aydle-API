@@ -27,3 +27,61 @@ Delete all dummy rooms from the server.
 /clear
 ```
 
+## Server Objects
+
+### Room
+
+returns the code for the room
+
+```
+room.code
+```
+
+returns an array of player objects
+
+```
+room.players
+```
+
+returns true if the room has already started its games
+
+```
+room.isPlaying
+```
+
+### Player
+
+returns the playerID which is assigned on the client side
+
+```
+player.playerID
+```
+
+returns the of the socket connection ID associated with the player
+
+```
+player.socketID
+```
+
+returns the total score of the player
+
+```
+player.score
+```
+
+returns true if the player is the host
+
+```
+player.isHost
+```
+
+returns the name of the player 
+
+```
+player.name
+```
+
+
+ 
+
+
