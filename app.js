@@ -1,8 +1,11 @@
 
 // setup express
 var express = require('express');
+var cors = require('cors')
 var app = express();
 var serv = require('http').Server(app);
+
+app.use(cors())
 
 app.get('/',function(req,res){
 	res.sendFile(__dirname + '/client/index.html');
@@ -41,12 +44,14 @@ app.get('/clear', function(req,res)
   res.send('all dummy rooms deleted.');
 });
 
-
-
-
-
-
-app.use('/client', express.static(__dirname + '/client'));
+// app.use((req, res, next) => {
+  //'/client', express.static(__dirname + '/client')
+// );
+// app.use(function(req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//   next();
+// });
 
 serv.listen(process.env.PORT || 2000);
 
@@ -89,11 +94,14 @@ io.sockets.on('connection', function(socket)
 		// socket may not have the room object attached if disconnect fires upon join/host failure
 		if('currentRoom' in socket)
 		{
+			let playerID = socket.currentRoom.GetPlayerBySocketID(socket.id).playerID;
 			socket.currentRoom.RemovePlayer(socket.id);
 			CheckForEmptyRooms();
 
 			// this line needs revision ***
-			io.to(socket.currentRoom.code).emit('disconnect',socket.id);
+		
+			io.to(socket.currentRoom.code).emit('onPlayerUpdate', {playerID:playerID});
+			//io.to(socket.currentRoom.code).emit('disconnect',socket.id);
 		}
 	});
 
@@ -164,7 +172,8 @@ io.sockets.on('connection', function(socket)
 			}
 		}
 
-		socket.broadcast.to(roomCode).emit('notifyJoin',playerThatChangedName);
+		io.to(socket.currentRoom.code).emit('onPlayerUpdate',{playerID:playerThatChangedName.playerID,name:name});
+		socket.broadcast.to(socket.currentRoom.code).emit('notifyJoin',playerThatChangedName);
 	});
 
 //=============================== Game Stuff =================================//
