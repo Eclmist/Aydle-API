@@ -157,6 +157,22 @@ io.sockets.on('connection', function(socket)
 		socket.emit('onHostCode',createdRoom);
 	});
 
+	socket.on('kickPlayer',function(roomCode,playerID)
+	{
+		let room = gamerooms[roomCode];
+
+		if(room !== undefined)
+		{
+			let player = room.GetPlayerByPlayerID(playerID);
+
+			if(player !== undefined)
+			{
+				room.RemovePlayer(player.socketID);
+			}
+
+		}
+
+	});
 
 	socket.on('enterRoomAs',function(name)
 	{
