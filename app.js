@@ -37,28 +37,6 @@ app.get('/room/:id', function(req,res)
 	res.send({result:result});
 });
 
-app.post('/host/:id', function(req,res)
-{
-	let code = req.params.id;
-	if(gamerooms[code] === undefined)
-	{
-		let room = RoomUtils.CreateRoom(code);
-		gamerooms[code] = room;
-	}
-	
-	
-});
-
-app.post('/remove/:id', function(req,res)
-{
-	let code = req.params.id;
-	if(gamerooms[code] !== undefined)
-	{
-		delete gamerooms[code];
-	}
-	
-	
-});
 
 app.get('/dummy/:id', function(req,res)
 {
