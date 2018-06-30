@@ -12,7 +12,7 @@ var corsOptions = {
 
 app.use(cors())
  app.use(function(req, res, next) {
-   res.header("Access-Control-Allow-Origin", "*");
+	 res.header("Access-Control-Allow-Origin", "*");
    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
    next();
  });
@@ -32,9 +32,31 @@ app.get('/room/:id', function(req,res)
     {
       result = true;
     }
-  }
+	}
 
 	res.send({result:result});
+});
+
+app.post('/host/:id', function(req,res)
+{
+	let code = req.params.id;
+	if(gamerooms[code] === undefined)
+	{
+		RoomUtils.CreateRoom(code);
+	}
+	
+	
+});
+
+app.post('/remove/:id', function(req,res)
+{
+	let code = req.params.id;
+	if(gamerooms[code] !== undefined)
+	{
+		delete gamerooms[code];
+	}
+	
+	
 });
 
 app.get('/dummy/:id', function(req,res)
@@ -162,7 +184,7 @@ io.sockets.on('connection', function(socket)
 		let createdRoom = RoomUtils.CreateRoom(generatedCode);
 		createdRoom.AddPlayer(socket.id,playerID,name);
 		gamerooms[generatedCode] = createdRoom;
-		// store the room object in the socket object
+		// store the room object in the socket object	
 		socket.currentRoom = createdRoom;
 
 		socket.emit('onHostCode',createdRoom);
