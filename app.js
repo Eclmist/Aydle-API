@@ -42,7 +42,8 @@ app.post('/host/:id', function(req,res)
 	let code = req.params.id;
 	if(gamerooms[code] === undefined)
 	{
-		RoomUtils.CreateRoom(code);
+		let room = RoomUtils.CreateRoom(code);
+		gamerooms[code] = room;
 	}
 	
 	
