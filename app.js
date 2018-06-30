@@ -97,16 +97,19 @@ io.sockets.on('connection', function(socket)
 			let playerID = socket.currentRoom.GetPlayerBySocketID(socket.id).playerID;
 			socket.currentRoom.RemovePlayer(socket.id);
 			CheckForEmptyRooms();
-
-			// this line needs revision ***
 		
-			io.to(socket.currentRoom.code).emit('onPlayerUpdate', {playerID:playerID});
-			//io.to(socket.currentRoom.code).emit('disconnect',socket.id);
+			io.in(socket.currentRoom.code).emit('onPlayerUpdate', {playerID:playerID});
+			let host = socket.currentRoom.GetHost();
+			io.in(socket.currentRoom.code).emit('onPlayerUpdate',
+			{
+				playerID : host.playerID,
+				isHost : host.isHost
+			});
 		}
 	});
 
 	// route the user to another socket channel
-	socket.on('requestJoin',function(code,playerID)
+	socket.on('requestJoin',function(code,playerID,name)
 	{
 		console.log('joing room ' + code + '.....');
     
@@ -119,12 +122,15 @@ io.sockets.on('connection', function(socket)
         socket.leaveAll();
 			  socket.join(code);
 
-			  room.AddPlayer(socket.id,playerID);
+				room.AddPlayer(socket.id,playerID,name);
+				let player = room.GetPlayerBySocketID(socket.id);
 			  // store the room object in the socket object
 			  socket.currentRoom = room;
 
 			  // give information about the room(games/players etc...) to the new player that joined
-			  socket.emit('onJoin',socket.currentRoom);
+				socket.emit('onJoin',socket.currentRoom);
+				socket.to(socket.currentRoom.code).emit('notifyJoin', player);
+				
         socket.emit('updateGameList',socket.currentRoom.games);  
         console.log(room.players);
       }
@@ -137,7 +143,7 @@ io.sockets.on('connection', function(socket)
 
 	});
 
-	socket.on('requestHost',function(playerID)
+	socket.on('requestHost',function(playerID,name)
 	{
 		console.log('hosting room...');
 		let generatedCode = GenerateUniqueCode(4);
@@ -149,7 +155,7 @@ io.sockets.on('connection', function(socket)
 		
 		// create the room object
 		let createdRoom = RoomUtils.CreateRoom(generatedCode);
-		createdRoom.AddPlayer(socket.id,playerID);
+		createdRoom.AddPlayer(socket.id,playerID,name);
 		gamerooms[generatedCode] = createdRoom;
 		// store the room object in the socket object
 		socket.currentRoom = createdRoom;
@@ -167,6 +173,7 @@ io.sockets.on('connection', function(socket)
 
 			if(player !== undefined)
 			{
+				socket.to(socket.currentRoom.code).emit('onPlayerUpdate',{playerID:playerID});
 				room.RemovePlayer(player.socketID);
 			}
 
@@ -174,7 +181,7 @@ io.sockets.on('connection', function(socket)
 
 	});
 
-	socket.on('enterRoomAs',function(name)
+	socket.on('setName',function(name)
 	{
 		let playerThatChangedName;
 
@@ -188,8 +195,16 @@ io.sockets.on('connection', function(socket)
 			}
 		}
 
-		io.to(socket.currentRoom.code).emit('onPlayerUpdate',{playerID:playerThatChangedName.playerID,name:name});
-		socket.broadcast.to(socket.currentRoom.code).emit('notifyJoin',playerThatChangedName);
+		if(playerThatChangedName !== undefined)
+		{
+			io.in(socket.currentRoom.code).emit('onPlayerUpdate',
+			{
+				playerID:playerThatChangedName.playerID,
+				name:name
+			});
+		}
+			
+		
 	});
 
 //=============================== Game Stuff =================================//
@@ -228,7 +243,7 @@ function CreateDebugRoom(code)
 	if(!RoomExist(code))
 	{
     let createdRoom = RoomUtils.CreateRoom(code);
-    createdRoom.AddPlayer('dummy','dummy');
+    createdRoom.AddPlayer('dummy','dummy','dummy');
     gamerooms[code] = createdRoom;
     return true;
   }
