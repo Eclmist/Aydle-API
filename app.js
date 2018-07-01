@@ -75,6 +75,8 @@ const io = require('socket.io')(serv, {
   transports: ['websocket', 'xhr-polling']
 });
 
+io.origins('*:*')
+
 io.sockets.on('connection', function(socket)
 {
 	console.log('a client connected');
