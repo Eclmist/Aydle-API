@@ -4,20 +4,11 @@ var express = require('express');
 var cors = require('cors')
 var app = express();
 
-var whitelist = ["https://aydle.com:80", /\.aydle.com\.com$/, "localhost"]
 var corsOptions = {
-	origin: whitelist,
 	credentials: true
 }
-app.use(cors(corsOptions));
 
-app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Credentials" , 'true');
-	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-	next();	
-});
+app.use(cors(corsOptions));
 
 app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
