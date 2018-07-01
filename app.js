@@ -1,6 +1,7 @@
 
 // setup express
 var express = require('express');
+var cors = require('cors');
 var app = express();
 
 var whitelist = ["https://aydle.com:80", /\.aydle.com\.com$/, "localhost"]
