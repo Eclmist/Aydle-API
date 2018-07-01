@@ -14,7 +14,7 @@ let corsOptions = {
 				}
 		},credentials: true
 }
-this.app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
