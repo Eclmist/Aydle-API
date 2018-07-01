@@ -61,7 +61,7 @@ app.get('/clear', function(req,res)
 
 var serv = require('http').Server(app);
 
-serv.listen(process.env.PORT || 2000);
+serv.listen(process.env.PORT);
 
 // require modules
 var PassTheBombServer = require('games/PassTheBombServer');
