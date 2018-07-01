@@ -71,11 +71,10 @@ var gamerooms = {};
 
 // setup socket.io
 
-const io = require('socket.io')(serv, {
-  transports: ['websocket', 'xhr-polling']
-});
+const io = require('socket.io')(serv, {});
 
-io.origins('*:*')
+// restrict to only stuff
+io.origins(['localhost:*', 'https://aydle.com:80', 'https://www.aydle.com:80'])
 
 io.sockets.on('connection', function(socket)
 {
