@@ -4,24 +4,25 @@ var express = require('express');
 var cors = require('cors')
 var app = express();
 
-// var corsOptions = {
-// 	origin: ["http://aydle.com", /\.aydle.com\.com$/],
-// 	credentials: true,
-//   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+let whitelist = ["http://aydle.com:80", /\.aydle.com\.com$/]
+let corsOptions = {
+	origin: (origin, callback) => {
+				if (whitelist.indexOf(origin) !== -1) {
+						callback(null, true)
+				} else {
+						callback(new Error('Not allowed by CORS'))
+				}
+		},credentials: true
+}
+this.app.use(cors(corsOptions));
 
-// }
-
-// app.use(cors(corsOptions))
-
-/*
- app.use(function(req, res, next) {
-	 res.header("Access-Control-Allow-Origin", "*");
-	 res.header("Access-Control-Allow-Credentials" , 'true');
-	 res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
-   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-   next();	
- });
-*/
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Credentials" , 'true');
+	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();	
+});
 
 app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
