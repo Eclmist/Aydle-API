@@ -4,14 +4,14 @@ var express = require('express');
 var cors = require('cors')
 var app = express();
 
-var corsOptions = {
-	origin: ["http://aydle.com", /\.aydle.com\.com$/],
-	credentials: true,
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+// var corsOptions = {
+// 	origin: ["http://aydle.com", /\.aydle.com\.com$/],
+// 	credentials: true,
+//   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 
-}
+// }
 
-app.use(cors(corsOptions))
+// app.use(cors(corsOptions))
 
 /*
  app.use(function(req, res, next) {
@@ -81,7 +81,7 @@ var gamerooms = {};
 
 var io = require('socket.io')(serv,{ });
 // set allowed origins
-io.origins(['https://aydle.com', 'https://www.aydle.com']);
+// io.origins(['https://aydle.com', 'https://www.aydle.com']);
 
 
 io.sockets.on('connection', function(socket)
