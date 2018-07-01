@@ -11,11 +11,9 @@ var corsOptions = {
 
 }
 
-
 app.use(cors())
 
-var serv = require('http').Server(app);
-/*
+
  app.use(function(req, res, next) {
 	 res.header("Access-Control-Allow-Origin", "*");
 	 res.header("Access-Control-Allow-Credentials" , 'true');
@@ -23,7 +21,7 @@ var serv = require('http').Server(app);
    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
    next();	
  });
-*/
+
 app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
 	res.send('running');
@@ -66,6 +64,8 @@ app.get('/clear', function(req,res)
 // app.use((req, res, next) => {
   //'/client', express.static(__dirname + '/client')
 // );
+
+var serv = require('http').Server(app);
 
 serv.listen(process.env.PORT || 2000);
 
