@@ -1,14 +1,7 @@
 
 // setup express
 var express = require('express');
-// var cors = require('cors')
 var app = express();
-
-// var corsOptions = {
-// 	credentials: true
-// }
-
-// app.use(cors(corsOptions));
 
 app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
@@ -74,7 +67,7 @@ var gamerooms = {};
 const io = require('socket.io')(serv, {});
 
 // restrict to only stuff
-io.origins(['localhost:*', 'https://aydle.com:80', 'https://www.aydle.com:80'])
+io.set('origins', 'https://aydle.com:* https://www.aydle.com:* http://localhost:*')
 
 io.sockets.on('connection', function(socket)
 {
