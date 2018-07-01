@@ -1,14 +1,14 @@
 
 // setup express
 var express = require('express');
-var cors = require('cors')
+// var cors = require('cors')
 var app = express();
 
-var corsOptions = {
-	credentials: true
-}
+// var corsOptions = {
+// 	credentials: true
+// }
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
