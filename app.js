@@ -77,7 +77,7 @@ var RoomUtils = require('server/RoomUtils');
 var gamerooms = {};
 
 // setup socket.io
-var io = require('socket.io')(serv,{credentials});
+var io = require('socket.io')(serv,{});
 // set allowed origins
 io.origins(["https://aydle.com"]);
 
