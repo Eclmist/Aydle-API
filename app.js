@@ -61,7 +61,7 @@ app.get('/clear', function(req,res)
 
 var serv = require('http').Server(app);
 
-serv.listen(process.env.PORT);
+serv.listen(process.env.PORT || 80);
 
 // require modules
 var PassTheBombServer = require('games/PassTheBombServer');
@@ -108,9 +108,9 @@ io.sockets.on('connection', function(socket)
 			socket.currentRoom.RemovePlayer(socket.id);
 			CheckForEmptyRooms();
 		
-			io.in(socket.currentRoom.code).emit('onPlayerUpdate', {playerID:playerID});
+			io.in(socket.currentRoom.code).emit('onPeerUpdate', {playerID:playerID,hasDisconnected:true});
 			let host = socket.currentRoom.GetHost();
-			io.in(socket.currentRoom.code).emit('onPlayerUpdate',
+			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
 				playerID : host.playerID,
 				isHost : host.isHost
@@ -139,7 +139,7 @@ io.sockets.on('connection', function(socket)
 
 			  // give information about the room(games/players etc...) to the new player that joined
 				socket.emit('onJoin',socket.currentRoom);
-				socket.to(socket.currentRoom.code).emit('notifyJoin', player);
+				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
 				
         socket.emit('updateGameList',socket.currentRoom.games);  
         console.log(room.players);
@@ -183,7 +183,7 @@ io.sockets.on('connection', function(socket)
 
 			if(player !== undefined)
 			{
-				socket.to(socket.currentRoom.code).emit('onPlayerUpdate',{playerID:playerID});
+				socket.to(socket.currentRoom.code).emit('onPeerUpdate',{playerID:playerID,hasDisconnected:true});
 				room.RemovePlayer(player.socketID);
 			}
 
@@ -207,7 +207,7 @@ io.sockets.on('connection', function(socket)
 
 		if(playerThatChangedName !== undefined)
 		{
-			io.in(socket.currentRoom.code).emit('onPlayerUpdate',
+			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
 				playerID:playerThatChangedName.playerID,
 				name:name
