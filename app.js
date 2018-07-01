@@ -67,7 +67,7 @@ var gamerooms = {};
 const io = require('socket.io')(serv, {});
 
 // restrict to only stuff
-io.set('origins', 'https://aydle.com:* https://www.aydle.com:* http://localhost:*')
+// io.set('origins', 'https://aydle.com:* https://www.aydle.com:* http://localhost:*')
 
 io.sockets.on('connection', function(socket)
 {
