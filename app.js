@@ -17,7 +17,7 @@ app.get('/',function(req,res){
 
 app.get('/what', function (req,res)
 {
-	res.send(req.headers);
+	res.send(res.headers);
 });
 
 app.get('/room/:id', function(req,res)
@@ -71,10 +71,9 @@ var gamerooms = {};
 
 // setup socket.io
 
-var io = require('socket.io')(serv,{ });
-// set allowed origins
-// io.origins(['https://aydle.com', 'https://www.aydle.com']);
-
+const io = require('socket.io')(serv, {
+  transports: ['websocket', 'xhr-polling']
+});
 
 io.sockets.on('connection', function(socket)
 {
