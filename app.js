@@ -3,8 +3,6 @@
 var express = require('express');
 var app = express();
 
-<<<<<<< HEAD
-=======
 var whitelist = ["https://aydle.com:80", /\.aydle.com\.com$/, "localhost"]
 var corsOptions = {
 	origin: whitelist,
@@ -12,7 +10,6 @@ var corsOptions = {
 }
 app.use(cors(corsOptions));
 
->>>>>>> argh
 app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
 	res.send('running');
