@@ -3,7 +3,6 @@
 var express = require('express');
 var cors = require('cors')
 var app = express();
-var serv = require('http').Server(app);
 
 var corsOptions = {
 	origin: '*',
@@ -15,6 +14,7 @@ var corsOptions = {
 
 app.use(cors(corsOptions))
 
+var serv = require('http').Server(app);
 /*
  app.use(function(req, res, next) {
 	 res.header("Access-Control-Allow-Origin", "*");
@@ -77,7 +77,7 @@ var RoomUtils = require('server/RoomUtils');
 var gamerooms = {};
 
 // setup socket.io
-var io = require('socket.io')(serv,{});
+var io = require('socket.io')(serv,{credentials});
 // set allowed origins
 io.origins(["https://aydle.com"]);
 
