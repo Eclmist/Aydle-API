@@ -6,14 +6,14 @@ var app = express();
 
 var corsOptions = {
 	origin: '*',
-	credentials: 'true',
+	credentials: true,
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 
 }
 
-app.use(cors())
+app.use(cors(corsOptions))
 
-
+/*
  app.use(function(req, res, next) {
 	 res.header("Access-Control-Allow-Origin", "*");
 	 res.header("Access-Control-Allow-Credentials" , 'true');
@@ -21,6 +21,7 @@ app.use(cors())
    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
    next();	
  });
+*/
 
 app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
@@ -79,7 +80,7 @@ var gamerooms = {};
 // setup socket.io
 var io = require('socket.io')(serv,{});
 // set allowed origins
-io.origins(["https://aydle.com"]);
+io.origins("https://aydle.com");
 
 io.sockets.on('connection', function(socket)
 {
