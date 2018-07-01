@@ -6,19 +6,24 @@ var app = express();
 var serv = require('http').Server(app);
 
 var corsOptions = {
-  origin: 'http://localhost:8080',
+	origin: '*',
+	credentials: 'true',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+
 }
 
-app.use(cors())
 
+app.use(cors(corsOptions))
+
+/*
  app.use(function(req, res, next) {
 	 res.header("Access-Control-Allow-Origin", "*");
 	 res.header("Access-Control-Allow-Credentials" , 'true');
+	 res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
    next();	
  });
-
+*/
 app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
 	res.send('running');
