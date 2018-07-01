@@ -12,7 +12,7 @@ var corsOptions = {
 }
 
 
-app.use(cors(corsOptions))
+app.use(cors())
 
 var serv = require('http').Server(app);
 /*
