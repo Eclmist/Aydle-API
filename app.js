@@ -79,7 +79,7 @@ var gamerooms = {};
 // setup socket.io
 var io = require('socket.io')(serv,{});
 // set allowed origins
-//io.origins(["175.156.162.3:2000"]);
+io.origins(["https://aydle.com"]);
 
 io.sockets.on('connection', function(socket)
 {
