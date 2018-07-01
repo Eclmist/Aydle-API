@@ -15,6 +15,11 @@ app.get('/',function(req,res){
 	res.send('running');
 });	
 
+app.get('/what', function (req,res)
+{
+	res.send(req.headers);
+});
+
 app.get('/room/:id', function(req,res)
 {
   let result = false;
