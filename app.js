@@ -189,7 +189,7 @@ io.sockets.on('connection', function(socket)
 		// store the room object in the socket object	
 		socket.currentRoom = createdRoom;
 
-		socket.emit('onHostCode',createdRoom);
+		socket.emit('onJoin',createdRoom);
 	});
 
 	socket.on('kickPlayer',function(roomCode,playerID)
