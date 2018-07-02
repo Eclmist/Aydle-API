@@ -123,33 +123,48 @@ io.sockets.on('connection', function(socket)
 	{
 		console.log('joing room ' + code + '.....');
     
-    let room = gamerooms[code];
-    
-    if(room !== undefined)
-    {
-      if(CanJoinRoom(room))
-      {
-        socket.leaveAll();
-			  socket.join(code);
+		let room = gamerooms[code];
+		
+		if(room !== undefined)
+		{
+			if(CanJoinRoom(room))
+			{
+				socket.leaveAll();
+				socket.join(code);
+
+				let oldPlayer = room.GetPlayerByPlayerID(playerID);
+			
+				if(oldPlayer !== undefined)
+				{
+					
+					socket.emit('onPeerUpdate', 
+					{
+						playerID : oldPlayer.playerID,
+						hasDisconnected : 'multiple-clients-detected'
+					});
+
+					room.RemovePlayer(oldPlayer.socketID);
+				}
+
 
 				room.AddPlayer(socket.id,playerID,name);
 				let player = room.GetPlayerBySocketID(socket.id);
-			  // store the room object in the socket object
-			  socket.currentRoom = room;
+				// store the room object in the socket object
+				socket.currentRoom = room;
 
-			  // give information about the room(games/players etc...) to the new player that joined
+				// give information about the room(games/players etc...) to the new player that joined
 				socket.emit('onJoin',socket.currentRoom);
 				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
-				
-        socket.emit('updateGameList',socket.currentRoom.games);  
-        console.log(room.players);
-      }
-    }
-    else
-    {
-      socket.emit('onJoinFail');
-			socket.disconnect();
-    }
+						
+				socket.emit('updateGameList',socket.currentRoom.games);  
+				console.log(room.players);
+			}
+		}
+		else
+		{
+			socket.emit('onJoinFail');
+				socket.disconnect();
+		}
 
 	});
 
