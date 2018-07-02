@@ -346,7 +346,7 @@ function GenerateUniqueCode(codeCount)
 		 }
 	 } 
 
-	 return code;
+	 return code.toUpperCase();
 }
 
 
