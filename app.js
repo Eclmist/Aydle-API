@@ -6,7 +6,7 @@ var app = express();
 
 var whitelist = ["https://aydle.com", "https://www.aydle.com"]
 var corsOptions = {
-	origin: '*',
+	origin: whitelist,
 	credentials: true
 }
 app.use(cors(corsOptions));
