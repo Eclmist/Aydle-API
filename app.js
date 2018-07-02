@@ -108,7 +108,12 @@ io.sockets.on('connection', function(socket)
 			socket.currentRoom.RemovePlayer(socket.id);
 			CheckForEmptyRooms();
 		
-			io.in(socket.currentRoom.code).emit('onPeerUpdate', {playerID:playerID,hasDisconnected:true});
+			io.in(socket.currentRoom.code).emit('onPeerUpdate',
+			{
+				playerID : playerID,
+				hasDisconnected : 'user-left'
+			});
+
 			let host = socket.currentRoom.GetHost();
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
