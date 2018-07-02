@@ -71,7 +71,6 @@ var RoomUtils = require('server/RoomUtils');
 var gamerooms = {};
 
 // setup socket.io
-
 const io = require('socket.io')(serv, {});
 
 // restrict to only stuff

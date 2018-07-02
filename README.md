@@ -51,6 +51,19 @@ room.isPlaying
 
 ### Player
 
+returns the following error codes of (string) type
+
+```
+player.hasDisconnected
+
+// error codes :
+//	
+// 'kicked-by-host'
+// 'user-left'
+// 'multiple-clients-detected'
+ 
+```
+
 returns the playerID which is assigned on the client side
 
 ```
@@ -80,6 +93,7 @@ returns the name of the player
 ```
 player.name
 ```
+
 
 
  
