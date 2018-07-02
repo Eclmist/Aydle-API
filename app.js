@@ -4,9 +4,9 @@ var express = require('express');
 var cors = require('cors');
 var app = express();
 
-var whitelist = ["https://aydle.com", "https://www.aydle.com", "localhost:8080"]
+var whitelist = ["https://aydle.com", "https://www.aydle.com"]
 var corsOptions = {
-	origin: whitelist,
+	origin: '*',
 	credentials: true
 }
 app.use(cors(corsOptions));
