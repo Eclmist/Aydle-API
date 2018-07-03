@@ -123,7 +123,6 @@ io.sockets.on('connection', function(socket)
 	// route the user to another socket channel
 	socket.on('requestJoin',function(code,playerID,callback)
 	{
-		console.log('joing room ' + code + '.....');
     
 		let room = gamerooms[code];
 		
@@ -138,6 +137,7 @@ io.sockets.on('connection', function(socket)
 				let oldPlayer = room.GetPlayerByPlayerID(playerID);
 			
 				room.AddPlayer(socket.id,playerID);
+				socket.currentRoom = room;
 				socket.emit('onJoin',room);
 
 				if(oldPlayer !== undefined)
@@ -148,12 +148,11 @@ io.sockets.on('connection', function(socket)
 						hasDisconnected : 'multiple-clients-detected'
 					});
 
-					room.RemovePlayer(oldPlayer.socketID);
+					socket.currentRoom.RemovePlayer(oldPlayer.socketID);
 				}
 				
-				let player = room.GetPlayerBySocketID(socket.id);
-				// store the room object in the socket object
-				socket.currentRoom = room;
+				let player = socket.currentRoom.GetPlayerBySocketID(socket.id);
+				
 				callback();
 				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
 						
@@ -228,7 +227,7 @@ io.sockets.on('connection', function(socket)
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
 				playerID:playerThatChangedName.playerID,
-				name:name,
+				name:playerThatChangedName.name,
 				isInitialized:playerThatChangedName.isInitialized
 			});
 		}
