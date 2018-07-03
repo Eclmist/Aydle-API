@@ -138,8 +138,8 @@ io.sockets.on('connection', function(socket)
 			
 				room.AddPlayer(socket.id,playerID);
 				socket.currentRoom = room;
-				socket.emit('onJoin',room);
-
+				successCallback(socket.currentRoom);
+				
 				if(oldPlayer !== undefined)
 				{
 					socket.emit('onPeerUpdate', 
@@ -153,7 +153,7 @@ io.sockets.on('connection', function(socket)
 				
 				let player = socket.currentRoom.GetPlayerBySocketID(socket.id);
 				
-				successCallback();
+				
 				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
 						
 			}
@@ -184,8 +184,7 @@ io.sockets.on('connection', function(socket)
 		// store the room object in the socket object	
 		socket.currentRoom = createdRoom;
 
-		socket.emit('onJoin',createdRoom);
-		callback();
+		callback(socket.currentRoom);
 	});
 
 	socket.on('kickPlayer',function(roomCode,playerID)
