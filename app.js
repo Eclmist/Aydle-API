@@ -214,10 +214,10 @@ io.sockets.on('connection', function(socket)
 
 		for(let i = 0; i < socket.currentRoom.players.length; i++)
 		{
-			if(players[i].socketID === socket.id)
+			if(socket.currentRoom.players[i].socketID === socket.id)
 			{
-				player[i].name = name;
-				playerThatChangedName = players[i];
+				socket.currentRoom.players[i].name = name;
+				playerThatChangedName = socket.currentRoom.players[i];
 				break;
 			}
 		}
