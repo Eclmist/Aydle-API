@@ -121,7 +121,7 @@ io.sockets.on('connection', function(socket)
 	});
 
 	// route the user to another socket channel
-	socket.on('requestJoin',function(code,playerID,callback)
+	socket.on('requestJoin',function(code,playerID,successCallback,failureCallback)
 	{
     
 		let room = gamerooms[code];
@@ -153,15 +153,15 @@ io.sockets.on('connection', function(socket)
 				
 				let player = socket.currentRoom.GetPlayerBySocketID(socket.id);
 				
-				callback();
+				successCallback();
 				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
 						
 			}
 		}
 		else
 		{
-			socket.emit('onJoinFail');
-				socket.disconnect();
+			failureCallback();
+			socket.disconnect();
 		}
 
 	});
