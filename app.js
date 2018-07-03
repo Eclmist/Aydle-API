@@ -16,9 +16,12 @@ app.get('/',function(req,res){
 	res.send('running');
 });	
 
-app.get('/what', function (req,res)
+app.get('/games', function (req,res)
 {
-	res.send(res.headers);
+	res.send(
+		{
+			
+		});
 });
 
 app.get('/room/:id', function(req,res)
@@ -64,8 +67,8 @@ var serv = require('http').Server(app);
 serv.listen(process.env.PORT || 2000);
 
 // require modules
-var PassTheBombServer = require('games/PassTheBombServer');
 var RoomUtils = require('server/RoomUtils');
+var GameUtils = require('server/GameUtils');
 
 // store a reference to all game rooms so we can access it without the socket's reference
 var gamerooms = {};
@@ -79,14 +82,6 @@ const io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket)
 {
 	console.log('a client connected');
-
-	// Pass the socket reference to all the game servers here ---------------------------//
-	PassTheBombServer.Init(io,socket);
-
-
-
-	//-----------------------------------------------------------------------------------//
-
 
 	// Set up all server handlers here
 	socket.emit('onConnected');
