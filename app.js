@@ -121,7 +121,7 @@ io.sockets.on('connection', function(socket)
 	});
 
 	// route the user to another socket channel
-	socket.on('requestJoin',function(code,playerID)
+	socket.on('requestJoin',function(code,playerID,callback)
 	{
 		console.log('joing room ' + code + '.....');
     
@@ -154,7 +154,7 @@ io.sockets.on('connection', function(socket)
 				let player = room.GetPlayerBySocketID(socket.id);
 				// store the room object in the socket object
 				socket.currentRoom = room;
-		
+				callback();
 				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
 						
 			}
@@ -167,7 +167,7 @@ io.sockets.on('connection', function(socket)
 
 	});
 
-	socket.on('requestHost',function(playerID,name,roomName)
+	socket.on('requestHost',function(playerID,roomName,callback)
 	{
 		console.log('hosting room...');
 		let generatedCode = GenerateUniqueCode(4);
@@ -186,6 +186,7 @@ io.sockets.on('connection', function(socket)
 		socket.currentRoom = createdRoom;
 
 		socket.emit('onJoin',createdRoom);
+		callback();
 	});
 
 	socket.on('kickPlayer',function(roomCode,playerID)
