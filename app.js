@@ -19,13 +19,7 @@ app.get('/',function(req,res){
 	res.send('running');
 });	
 
-app.get('/games', function (req,res)
-{
-	res.send(
-		{
-			
-		});
-});
+
 
 app.get('/room/:id', function(req,res)
 {
