@@ -134,11 +134,14 @@ io.sockets.on('connection', function(socket)
 				socket.leaveAll();
 				socket.join(code);
 
+				// grab the old player before adding the new one
 				let oldPlayer = room.GetPlayerByPlayerID(playerID);
 			
+				room.AddPlayer(socket.id,playerID);
+				socket.emit('onJoin',room);
+
 				if(oldPlayer !== undefined)
 				{
-					
 					socket.emit('onPeerUpdate', 
 					{
 						playerID : oldPlayer.playerID,
@@ -147,19 +150,13 @@ io.sockets.on('connection', function(socket)
 
 					room.RemovePlayer(oldPlayer.socketID);
 				}
-
-
-				room.AddPlayer(socket.id,playerID);
+				
 				let player = room.GetPlayerBySocketID(socket.id);
 				// store the room object in the socket object
 				socket.currentRoom = room;
-
-				// give information about the room(games/players etc...) to the new player that joined
-				socket.emit('onJoin',socket.currentRoom);
+		
 				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
 						
-				socket.emit('updateGameList',socket.currentRoom.games);  
-				console.log(room.players);
 			}
 		}
 		else
@@ -218,6 +215,7 @@ io.sockets.on('connection', function(socket)
 			if(socket.currentRoom.players[i].socketID === socket.id)
 			{
 				socket.currentRoom.players[i].name = name;
+				socket.currentRoom.players[i].isInitialized = true;
 				playerThatChangedName = socket.currentRoom.players[i];
 				break;
 			}
@@ -230,7 +228,7 @@ io.sockets.on('connection', function(socket)
 			{
 				playerID:playerThatChangedName.playerID,
 				name:name,
-				isInitialized:true
+				isInitialized:playerThatChangedName.isInitialized
 			});
 		}
 			
