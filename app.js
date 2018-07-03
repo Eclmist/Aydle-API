@@ -102,7 +102,7 @@ io.sockets.on('connection', function(socket)
 		if('currentRoom' in socket)
 		{
 			let playerID = socket.currentRoom.GetPlayerBySocketID(socket.id).playerID;
-			socket.currentRoom.RemovePlayer(socket.id);
+			//socket.currentRoom.RemovePlayer(socket.id);
 			CheckForEmptyRooms();
 		
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
@@ -121,7 +121,7 @@ io.sockets.on('connection', function(socket)
 	});
 
 	// route the user to another socket channel
-	socket.on('requestJoin',function(code,playerID,name)
+	socket.on('requestJoin',function(code,playerID)
 	{
 		console.log('joing room ' + code + '.....');
     
@@ -149,7 +149,7 @@ io.sockets.on('connection', function(socket)
 				}
 
 
-				room.AddPlayer(socket.id,playerID,name);
+				room.AddPlayer(socket.id,playerID);
 				let player = room.GetPlayerBySocketID(socket.id);
 				// store the room object in the socket object
 				socket.currentRoom = room;
@@ -170,7 +170,7 @@ io.sockets.on('connection', function(socket)
 
 	});
 
-	socket.on('requestHost',function(playerID,name)
+	socket.on('requestHost',function(playerID,name,roomName)
 	{
 		console.log('hosting room...');
 		let generatedCode = GenerateUniqueCode(4);
@@ -182,7 +182,8 @@ io.sockets.on('connection', function(socket)
 		
 		// create the room object
 		let createdRoom = RoomUtils.CreateRoom(generatedCode);
-		createdRoom.AddPlayer(socket.id,playerID,name);
+		createdRoom.name = roomName;
+		createdRoom.AddPlayer(socket.id,playerID);
 		gamerooms[generatedCode] = createdRoom;
 		// store the room object in the socket object	
 		socket.currentRoom = createdRoom;
@@ -271,7 +272,7 @@ function CreateDebugRoom(code)
 	if(!RoomExist(code))
 	{
     let createdRoom = RoomUtils.CreateRoom(code);
-    createdRoom.AddPlayer('dummy','dummy','dummy');
+    createdRoom.AddPlayer('dummy','dummy');
     gamerooms[code] = createdRoom;
     return true;
   }
