@@ -208,7 +208,7 @@ io.sockets.on('connection', function(socket)
 
 	});
 
-	socket.on('setName',function(name)
+	socket.on('setName',function(name, callback)
 	{
 		let playerThatChangedName;
 
@@ -224,6 +224,7 @@ io.sockets.on('connection', function(socket)
 
 		if(playerThatChangedName !== undefined)
 		{
+			callback()
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
 				playerID:playerThatChangedName.playerID,
