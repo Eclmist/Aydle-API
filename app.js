@@ -150,7 +150,6 @@ io.sockets.on('connection', function(socket)
 				
 				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
 						
-				socket.emit('test')
 			}
 		}
 		else
