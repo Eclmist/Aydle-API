@@ -159,7 +159,8 @@ io.sockets.on('connection', function(socket)
 				
 				let player = gamerooms[code].GetPlayerBySocketID(socket.id);
 				
-				io.in(code).emit('onPeerUpdate', player);
+				if(player.isInitialized)
+					io.in(code).emit('onPeerUpdate', player);
 						
 			}
 		}
