@@ -139,7 +139,7 @@ io.sockets.on('connection', function(socket)
 						isPlaying : gamerooms[code].isPlaying,
 						players : []
 					}
-					,room);
+					,gamerooms[code]);
 
 				for(let i = 0; i < gamerooms[code].players.length; i++)
 				{
