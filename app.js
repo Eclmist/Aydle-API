@@ -117,9 +117,9 @@ io.sockets.on('connection', function(socket)
 	// route the user to another socket channel
 	socket.on('requestJoin',function(code,playerID,successCallback,failureCallback)
 	{
-    
-		let room = gamerooms[code];
 		
+		let room = gamerooms[code];
+		socket.emit('test')
 		if(room !== undefined)
 		{
 			if(CanJoinRoom(room))
