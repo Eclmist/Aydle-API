@@ -13,11 +13,19 @@ var corsOptions = {
 	credentials: true
 }
 app.use(cors(corsOptions));
+app.use('/images', express.static(__dirname + '/images'));
 
 app.get('/',function(req,res){
 	//res.sendFile(__dirname + '/client/index.html');
 	res.send('running');
 });	
+
+app.get('/games', function (req,res)
+{
+	let gameList = GetShortenedGameList();
+	res.send(gameList);
+});
+
 
 
 
@@ -429,4 +437,26 @@ function CheckForEmptyRooms()
 		
 		console.log(gamerooms);
 	}
+}
+
+
+function GetShortenedGameList()
+{
+	let games = GameUtils.GetGameList();
+	let shortened = [];
+
+	for(let i = 0; i < games.length; i++)
+	{
+		shortened.push
+		(
+			{
+				gameID : games[i].gameID,
+				name : games[i].name,
+				previewURL : __dirname + '/' + games[i].preview
+			}
+		);
+	}
+
+	return shortened;
+	
 }
