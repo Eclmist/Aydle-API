@@ -290,6 +290,22 @@ io.sockets.on('connection', function(socket)
 	});
 //=============================== END Game Stuff =============================//
 
+
+//=============================== Debug Game =================================//
+
+	socket.on('startDebugGame', function()
+	{
+		io.in(socket.currentRoom.code).emit('onStartGame', {
+			routeName: 'PassTheBomb',
+			id: 'debug/pass-the-bomb',
+			assets: {
+				images: { 
+					bomb: { url: '/images/bomb.png' } 
+				}
+			}
+		})
+	});
+
 });
 
 function RoomExist(code)
