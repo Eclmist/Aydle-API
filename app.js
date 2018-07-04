@@ -191,6 +191,7 @@ io.sockets.on('connection', function(socket)
 		let createdRoom = RoomUtils.CreateRoom(generatedCode);
 		createdRoom.name = roomName;
 		createdRoom.AddPlayer(socket.id,playerID);
+		createdRoom.GetPlayerBySocketID(socket.id).isHost = true;
 		gamerooms[generatedCode] = createdRoom;
 		// store the room object in the socket object	
 		socket.currentRoom = createdRoom;
