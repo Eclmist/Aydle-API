@@ -134,8 +134,7 @@ io.sockets.on('connection', function(socket)
 			socket.disconnect()
 			return
 		}
-
-
+		
 		socket.leaveAll();
 		socket.join(code);
 
