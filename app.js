@@ -300,7 +300,11 @@ io.sockets.on('connection', function(socket)
 
 //=============================== Debug Game =================================//
 
-	socket.on('startDebugGame', function()
+	var targetNumber = -1
+	var timeleft = 30
+	var gamerunning = false
+
+	socket.on('startDebugGame', () =>
 	{
 		io.in(socket.currentRoom.code).emit('onStartGame', {
 			routeName: 'PassTheBomb',
@@ -311,9 +315,50 @@ io.sockets.on('connection', function(socket)
 				}
 			}
 		})
+		this.gamerunning = true
+		this.targetNumber = GetRandNumber(1, 10)
+		io.in(socket.currentRoom.code).emit('PassBomb', socket.currentRoom.GetNextTarget().playerID, this.timeleft, this.targetNumber)
 	});
 
+	socket.on('pass', (time, number) =>
+	{
+		if (number === this.targetNumber) {
+
+			let timer = time
+			if (timer + 5 < 30)
+			{
+				timer = 30
+			} else {
+				timer += 5
+			}
+			this.timeleft = timer
+			this.targetNumber = GetRandNumber(1, 10)
+			io.in(socket.currentRoom.code).emit('PassBomb', socket.currentRoom.GetNextTarget().playerID, timer, this.targetNumber)
+		}
+	})
+
+	socket.on('generate', () =>
+	{
+		socket.emit('newRandomNumber', GetRandNumber(1,10))
+	});
+
+	setInterval(() => {
+		if (this.gamerunning === true) {
+
+			this.timeleft -= 0.033;
+			if (this.timeleft <= 0)
+			
+			io.in(socket.currentRoom.code).emit('explode')
+			this.gamerunning === false
+			this.timeleft = 30
+		}
+	}, 33)
 });
+
+function GetRandNumber(max, min) //both inclusive
+{
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 function RoomExist(code)
 {
