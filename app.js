@@ -95,24 +95,33 @@ io.sockets.on('connection', function(socket)
 		// socket may not have the room object attached if disconnect fires upon join/host failure
 		if('currentRoom' in socket)
 		{
-			let playerID = socket.currentRoom.GetPlayerBySocketID(socket.id).playerID;
+			let player = socket.currentRoom.GetPlayerBySocketID(socket.id);
+			player.isAway = true;
 			//socket.currentRoom.RemovePlayer(socket.id);
 			//CheckForEmptyRooms();
 		
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
-				playerID : playerID,
+				playerID : player.playerID,
 				hasDisconnected : 'user-left'
 			});
 
-			let host = socket.currentRoom.GetHost();
-			io.in(socket.currentRoom.code).emit('onPeerUpdate',
+			if(player.isHost)
 			{
-				playerID : host.playerID,
-				isHost : host.isHost
-			});
+				player.isHost = false;
+				socket.currentRoom.AppointNewHost();
+				gamerooms[socket.currentRoom.code] = socket.currentRoom;
+				let host = socket.currentRoom.GetHost();
+				io.in(socket.currentRoom.code).emit('onPeerUpdate',
+				{
+					playerID : host.playerID,
+					isHost : host.isHost
+				});
+			}			
 		}
 	});
+
+	
 
 	// route the user to another socket channel
 	socket.on('requestJoin',function(code,playerID, successCallback)
@@ -130,22 +139,11 @@ io.sockets.on('connection', function(socket)
 				gamerooms[code].AddPlayer(socket.id,playerID);
 				socket.currentRoom = gamerooms[code];
 				
-				// make a duplicate room with only the initialized players
-				let initializedPlayers = [];
-
-				for(let i = 0; i < gamerooms[code].players.length; i++)
-				{
-					if(gamerooms[code].players[i].isInitialized)
-						initializedPlayers.push(gamerooms[code].players[i]);
-				}
 
 				// onJoin
-				successCallback({
-					name : gamerooms[code].name,
-					players : initializedPlayers,
-					code : code
-				});
-				
+				successCallback(socket);
+				UpdateLobby(socket,GetRoomWithVisiblePlayers(code));
+
 				if(oldPlayer !== undefined)
 				{
 					socket.emit('onPeerUpdate', 
@@ -210,6 +208,21 @@ io.sockets.on('connection', function(socket)
 
 	});
 
+	socket.on('setLobbyName',function(name, callback)
+	{
+		if(socket.currentRoom !== undefined)
+		{
+			socket.currentRoom.name = name;
+			gamerooms[socket.currentRoom.code] = socket.currentRoom;
+			UpdateLobby(socket,GetRoomWithVisiblePlayers(socket.currentRoom.code));
+			callback(true);
+		}
+		else
+		{
+			callback(false);
+		}
+	});
+
 	socket.on('setName',function(name, callback)
 	{
 		let playerThatChangedName;
@@ -227,13 +240,17 @@ io.sockets.on('connection', function(socket)
 
 		if(playerThatChangedName !== undefined)
 		{
-			callback()
+			callback(true);
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
 				playerID:playerThatChangedName.playerID,
 				name:playerThatChangedName.name,
 				isInitialized:playerThatChangedName.isInitialized
 			});
+		}
+		else
+		{
+			callback(false);
 		}
 			
 		
@@ -268,6 +285,11 @@ function RoomExist(code)
 function CanJoinRoom(room)
 {
   return !room.isPlaying;
+}
+
+function UpdateLobby(socket,updatedRoom)
+{
+	socket.emit('onLobbyUpdate', updatedRoom);
 }
 
 function CreateDebugRoom(code)
@@ -331,6 +353,31 @@ function GetRoomsByUser(id)
     }
 
     return usersRooms;	
+}
+
+function GetRoomWithVisiblePlayers(code)
+{
+	if(gamerooms[code] !== undefined)
+	{
+		// make a duplicate room with only the initialized players
+		let visiblePlayers = [];
+
+		for(let i = 0; i < gamerooms[code].players.length; i++)
+		{
+			if(gamerooms[code].players[i].isInitialized && !gamerooms[code].players[i].isAway)
+				visiblePlayers.push(gamerooms[code].players[i]);
+		}
+
+
+		return {
+			name: gamerooms[code].name,
+			code: code,
+			players: visiblePlayers,
+			isPlaying : gamerooms[code].isPlaying,
+			games : gamerooms[code].games
+		}
+
+	}
 }
 
 
