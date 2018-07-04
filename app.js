@@ -155,8 +155,15 @@ io.sockets.on('connection', function(socket)
 		
 		if(oldPlayer !== undefined)
 		{
-			oldPlayer.socketID = socket.id;
-			oldPlayer.isAway = false;
+			let replacement = Object.assign(
+				{
+					socketID : socket.id,
+					isAway : false
+				}
+				,oldPlayer);
+				
+			socket.currentRoom.RemovePlayer(oldPlayer.socketID);
+			socket.currentRoom.players.push(replacement);
 
 			successCallback(oldPlayer.name);
 
@@ -164,13 +171,11 @@ io.sockets.on('connection', function(socket)
 			{
 				playerID : oldPlayer.playerID,
 				hasDisconnected : 'multiple-clients-detected'
-			});
-
-			
-			
+			});			
 		}
 		else
 		{
+			socket.currentRoom.AddPlayer(socket.id,playerID);
 			successCallback('');
 		}
 
