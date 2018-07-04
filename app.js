@@ -158,10 +158,17 @@ io.sockets.on('connection', function(socket)
 			replacement.isAway = false;
 			replacement.socketID = socket.id;
 			
+			console.log('old ' + oldPlayer.socketID);
+			console.log('new ' + socket.id);
+
 			gamerooms[code].players.push(replacement);
 			io.sockets.connected[oldPlayer.socketID].disconnect();
 			gamerooms[code].RemovePlayer(oldPlayer.socketID);
-			
+
+			if(gamerooms[code].players.length > 1)
+			{
+				gamerooms[code].GetPlayerBySocketID(socket.id).isHost = false;
+			}
 
 			successCallback(oldPlayer.name);
 
