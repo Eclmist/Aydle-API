@@ -146,7 +146,7 @@ io.sockets.on('connection', function(socket)
 				{
 					successCallback(socket, oldPlayer.name);
 
-					socket.emit('onPeerUpdate', 
+					socket.to(oldPlayer.socketID).emit('onPeerUpdate', 
 					{
 						playerID : oldPlayer.playerID,
 						hasDisconnected : 'multiple-clients-detected'
@@ -415,7 +415,6 @@ function GenerateUniqueCode(codeCount)
 
 	 return code.toUpperCase();
 }
-
 
 // check for rooms with no players and delete them
 function CheckForEmptyRooms()
