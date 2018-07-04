@@ -139,13 +139,10 @@ io.sockets.on('connection', function(socket)
 				gamerooms[code].AddPlayer(socket.id,playerID);
 				socket.currentRoom = gamerooms[code];
 				
-
-				// onJoin
-				successCallback(socket);
-				UpdateLobby(socket,GetRoomWithVisiblePlayers(code));
-
 				if(oldPlayer !== undefined)
 				{
+					successCallback(socket, oldPlayer.name);
+
 					socket.emit('onPeerUpdate', 
 					{
 						playerID : oldPlayer.playerID,
@@ -154,6 +151,15 @@ io.sockets.on('connection', function(socket)
 
 					gamerooms[code].RemovePlayer(oldPlayer.socketID);
 				}
+				else
+				{
+					successCallback(socket,'');
+				}
+
+				// onJoin
+				successCallback(socket,);
+				UpdateLobby(socket,GetRoomWithVisiblePlayers(gamerooms[code]));
+
 				
 				let player = gamerooms[code].GetPlayerBySocketID(socket.id);
 				
@@ -214,7 +220,7 @@ io.sockets.on('connection', function(socket)
 		{
 			socket.currentRoom.name = name;
 			gamerooms[socket.currentRoom.code] = socket.currentRoom;
-			UpdateLobby(socket,GetRoomWithVisiblePlayers(socket.currentRoom.code));
+			UpdateLobby(socket,GetRoomWithVisiblePlayers(gamerooms[socket.currentRoom.code]));
 			callback(true);
 		}
 		else
@@ -355,29 +361,28 @@ function GetRoomsByUser(id)
     return usersRooms;	
 }
 
-function GetRoomWithVisiblePlayers(code)
+function GetRoomWithVisiblePlayers(room)
 {
-	if(gamerooms[code] !== undefined)
-	{
+
 		// make a duplicate room with only the initialized players
 		let visiblePlayers = [];
 
-		for(let i = 0; i < gamerooms[code].players.length; i++)
+		for(let i = 0; i < room.players.length; i++)
 		{
-			if(gamerooms[code].players[i].isInitialized && !gamerooms[code].players[i].isAway)
-				visiblePlayers.push(gamerooms[code].players[i]);
+			if(room.players[i].isInitialized && !room.players[i].isAway)
+				visiblePlayers.push(room.players[i]);
 		}
 
 
 		return {
-			name: gamerooms[code].name,
-			code: code,
+			name: room.name,
+			code: room.code,
 			players: visiblePlayers,
-			isPlaying : gamerooms[code].isPlaying,
-			games : gamerooms[code].games
-		}
+			isPlaying : room.isPlaying,
+			games : room.games
+		};
 
-	}
+	
 }
 
 
