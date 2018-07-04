@@ -116,9 +116,7 @@ io.sockets.on('connection', function(socket)
 
 	// route the user to another socket channel
 	socket.on('requestJoin',function(code,playerID, successCallback)
-	{
-		successCallback()
-		
+	{		
 		if(gamerooms[code] !== undefined)
 		{
 			if(CanJoinRoom(gamerooms[code]))
@@ -153,7 +151,6 @@ io.sockets.on('connection', function(socket)
 		}
 		else
 		{
-			failureCallback();
 			socket.disconnect();
 		}
 
