@@ -129,6 +129,8 @@ io.sockets.on('connection', function(socket)
 					});
 				}
 			}			
+
+
 		}
 	});
 
@@ -149,11 +151,13 @@ io.sockets.on('connection', function(socket)
 		// grab the old player before adding the new one
 		let oldPlayer = gamerooms[code].GetPlayerByPlayerID(playerID);
 	
-		gamerooms[code].AddPlayer(socket.id,playerID);
 		socket.currentRoom = gamerooms[code];
 		
 		if(oldPlayer !== undefined)
 		{
+			oldPlayer.socketID = socket.id;
+			oldPlayer.isAway = false;
+
 			successCallback(oldPlayer.name);
 
 			socket.to(oldPlayer.socketID).emit('onPeerUpdate', 
@@ -162,7 +166,8 @@ io.sockets.on('connection', function(socket)
 				hasDisconnected : 'multiple-clients-detected'
 			});
 
-			gamerooms[code].RemovePlayer(oldPlayer.socketID);
+			
+			
 		}
 		else
 		{
@@ -273,21 +278,12 @@ io.sockets.on('connection', function(socket)
 
 //=============================== Game Stuff =================================//
 
-	// update every other player's game list
-	socket.on('notifyAddGame',function(newestGameList)
+	socket.on('joinGame', function(gameID)
 	{
-		// store the games in the room object
-		socket.currentRoom.games = newestGameList;
-		socket.to(socket.currentRoom.code).emit('updateGameList', newestGameList);
+		let gameName = GameUtils.GetGameModuleName(gameID);
+        // init game rules in the socket
+        require('./games/' + gameName)(socket,io);
 	});
-
-
-	socket.on('requestStartGames',function()
-	{	
-		socket.currentRoom.games.reverse();
-		socket.currentRoom.isPlaying = true;
-	});
-
 //=============================== END Game Stuff =============================//
 
 });
@@ -419,6 +415,25 @@ function GenerateUniqueCode(codeCount)
 	 return code.toUpperCase();
 }
 
+function CheckRoomIsAway(code)
+{
+	let isActive = false;
+
+	for(let i = 0; i < gamerooms[code].players.length; i++)
+	{
+		if(!gamerooms[code].players[i].isAway)
+		{
+			isActive = true;
+			break;
+		}
+	}
+
+	if(!isActive)
+	{
+		delete gamerooms[code];
+	}
+}
+
 // check for rooms with no players and delete them
 function CheckForEmptyRooms()
 {
@@ -438,6 +453,7 @@ function CheckForEmptyRooms()
 		console.log(gamerooms);
 	}
 }
+
 
 
 function GetShortenedGameList()
