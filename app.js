@@ -143,9 +143,8 @@ io.sockets.on('connection', function(socket)
 						hasDisconnected : 'multiple-clients-detected'
 					});
 
-					socket.emit('test')
-
 					socket.currentRoom.RemovePlayer(oldPlayer.socketID);
+					socket.emit('test')
 				}
 				
 				let player = socket.currentRoom.GetPlayerBySocketID(socket.id);
