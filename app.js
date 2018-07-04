@@ -112,11 +112,14 @@ io.sockets.on('connection', function(socket)
 				socket.currentRoom.AppointNewHost();
 				gamerooms[socket.currentRoom.code] = socket.currentRoom;
 				let host = socket.currentRoom.GetHost();
-				io.in(socket.currentRoom.code).emit('onPeerUpdate',
-				{
-					playerID : host.playerID,
-					isHost : host.isHost
-				});
+
+				if (host !== undefined) {
+					io.in(socket.currentRoom.code).emit('onPeerUpdate',
+					{
+						playerID : host.playerID,
+						isHost : host.isHost
+					});
+				}
 			}			
 		}
 	});
