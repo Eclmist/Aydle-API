@@ -157,7 +157,6 @@ io.sockets.on('connection', function(socket)
 				}
 
 				// onJoin
-				successCallback(socket,);
 				UpdateLobby(socket,GetRoomWithVisiblePlayers(gamerooms[code]));
 
 				
