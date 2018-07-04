@@ -137,12 +137,13 @@ io.sockets.on('connection', function(socket)
 				
 				if(oldPlayer !== undefined)
 				{
-					socket.emit('test')
 					socket.emit('onPeerUpdate', 
 					{
 						playerID : oldPlayer.playerID,
 						hasDisconnected : 'multiple-clients-detected'
 					});
+
+					socket.emit('test')
 
 					socket.currentRoom.RemovePlayer(oldPlayer.socketID);
 				}
