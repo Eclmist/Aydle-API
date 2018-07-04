@@ -117,6 +117,7 @@ io.sockets.on('connection', function(socket)
 	// route the user to another socket channel
 	socket.on('requestJoin',function(code,playerID,successCallback,failureCallback)
 	{
+		successCallback()
 		
 		if(gamerooms[code] !== undefined)
 		{
