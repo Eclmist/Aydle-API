@@ -131,24 +131,20 @@ io.sockets.on('connection', function(socket)
 				socket.currentRoom = gamerooms[code];
 				
 				// make a duplicate room with only the initialized players
-				let theInitializedRoom = Object.assign(
-					{
-						name : gamerooms[code].name,
-						code : code,
-						games : gamerooms[code].games,
-						isPlaying : gamerooms[code].isPlaying,
-						players : []
-					}
-					,gamerooms[code]);
+				let initializedPlayers = [];
 
 				for(let i = 0; i < gamerooms[code].players.length; i++)
 				{
 					if(gamerooms[code].players[i].isInitialized)
-						theInitializedRoom.players.push(gamerooms[code].players[i]);
+						initializedPlayers.push(gamerooms[code].players[i]);
 				}
 
 				// onJoin
-				successCallback(theInitializedRoom);
+				successCallback({
+					name : gamerooms[code].name,
+					players : initializedPlayers,
+					code : code
+				});
 				
 				if(oldPlayer !== undefined)
 				{
