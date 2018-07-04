@@ -122,7 +122,6 @@ io.sockets.on('connection', function(socket)
 		
 		if(room !== undefined)
 		{
-			socket.emit('test')
 			if(CanJoinRoom(room))
 			{
 				socket.leaveAll();
@@ -133,6 +132,7 @@ io.sockets.on('connection', function(socket)
 			
 				room.AddPlayer(socket.id,playerID);
 				socket.currentRoom = room;
+				socket.emit('test')
 				successCallback(socket.currentRoom);
 				
 				if(oldPlayer !== undefined)
