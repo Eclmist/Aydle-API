@@ -118,20 +118,18 @@ io.sockets.on('connection', function(socket)
 	socket.on('requestJoin',function(code,playerID,successCallback,failureCallback)
 	{
 		
-		let room = gamerooms[code];
-		
-		if(room !== undefined)
+		if(gamerooms[code] !== undefined)
 		{
-			if(CanJoinRoom(room))
+			if(CanJoinRoom(gamerooms[code]))
 			{
 				socket.leaveAll();
 				socket.join(code);
 
 				// grab the old player before adding the new one
-				let oldPlayer = room.GetPlayerByPlayerID(playerID);
+				let oldPlayer = gamerooms[code].GetPlayerByPlayerID(playerID);
 			
-				room.AddPlayer(socket.id,playerID);
-				socket.currentRoom = room;
+				gamerooms[code].AddPlayer(socket.id,playerID);
+				socket.currentRoom = gamerooms[code];
 				
 				successCallback(socket.currentRoom);
 				
@@ -143,12 +141,12 @@ io.sockets.on('connection', function(socket)
 						hasDisconnected : 'multiple-clients-detected'
 					});
 
-					socket.currentRoom.RemovePlayer(oldPlayer.socketID);
+					gamerooms[code].RemovePlayer(oldPlayer.socketID);
 				}
 				
-				let player = socket.currentRoom.GetPlayerBySocketID(socket.id);
+				let player = gamerooms[code].GetPlayerBySocketID(socket.id);
 				
-				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
+				io.in(code).emit('onPeerUpdate', player);
 						
 			}
 		}
