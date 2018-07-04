@@ -156,8 +156,8 @@ io.sockets.on('connection', function(socket)
 					successCallback(socket,'');
 				}
 
-				// onJoin
-				UpdateLobby(socket,GetRoomWithVisiblePlayers(gamerooms[code]));
+				
+				//UpdateLobby(socket,GetRoomWithVisiblePlayers(gamerooms[code]));
 
 				
 				let player = gamerooms[code].GetPlayerBySocketID(socket.id);
