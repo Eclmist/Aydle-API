@@ -120,6 +120,7 @@ io.sockets.on('connection', function(socket)
 		
 		if(gamerooms[code] !== undefined)
 		{
+			successCallback({});
 			if(CanJoinRoom(gamerooms[code]))
 			{
 				socket.leaveAll();
