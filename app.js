@@ -97,7 +97,7 @@ io.sockets.on('connection', function(socket)
 		{
 			let playerID = socket.currentRoom.GetPlayerBySocketID(socket.id).playerID;
 			//socket.currentRoom.RemovePlayer(socket.id);
-			CheckForEmptyRooms();
+			//CheckForEmptyRooms();
 		
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
