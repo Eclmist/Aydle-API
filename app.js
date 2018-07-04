@@ -194,6 +194,7 @@ io.sockets.on('connection', function(socket)
 		let visiblePlayersRoom = GetRoomWithVisiblePlayers(socket.currentRoom);
 
 		callback(visiblePlayersRoom);
+		UpdateLobby(socket,visiblePlayersRoom);
 	});
 
 	socket.on('kickPlayer',function(roomCode,playerID)
