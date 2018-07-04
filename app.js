@@ -130,7 +130,7 @@ io.sockets.on('connection', function(socket)
 				}
 			}			
 
-
+			CheckRoomIsAway(socket.currentRoom.code);
 		}
 	});
 
