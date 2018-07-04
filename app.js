@@ -150,20 +150,18 @@ io.sockets.on('connection', function(socket)
 
 		// grab the old player before adding the new one
 		let oldPlayer = gamerooms[code].GetPlayerByPlayerID(playerID);
-	
 		socket.currentRoom = gamerooms[code];
 		
 		if(oldPlayer !== undefined)
 		{
-			let replacement = Object.assign(
-				{
-					socketID : socket.id,
-					isAway : false
-				}
-				,oldPlayer);
-				
-			socket.currentRoom.RemovePlayer(oldPlayer.socketID);
-			socket.currentRoom.players.push(replacement);
+			let replacement = Object.assign({socketID:1,isAway:false},oldPlayer);
+			replacement.isAway = false;
+			replacement.socketID = socket.id;
+			
+			gamerooms[code].players.push(replacement);
+			io.sockets.connected[oldPlayer.socketID].disconnect();
+			gamerooms[code].RemovePlayer(oldPlayer.socketID);
+			
 
 			successCallback(oldPlayer.name);
 
@@ -175,7 +173,7 @@ io.sockets.on('connection', function(socket)
 		}
 		else
 		{
-			socket.currentRoom.AddPlayer(socket.id,playerID);
+			gamerooms[code].AddPlayer(socket.id,playerID);
 			successCallback('');
 		}
 
@@ -184,6 +182,7 @@ io.sockets.on('connection', function(socket)
 
 		
 		let player = gamerooms[code].GetPlayerBySocketID(socket.id);
+		console.log(gamerooms[code].players);
 		
 		if(player.isInitialized)
 			io.in(code).emit('onPeerUpdate', player);
