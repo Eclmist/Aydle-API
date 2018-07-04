@@ -242,24 +242,21 @@ io.sockets.on('connection', function(socket)
 		{
 			if(socket.currentRoom.players[i].socketID === socket.id)
 			{
+				socket.currentRoom.players[i].name = name;
+				socket.currentRoom.players[i].isInitialized = true;
 				playerThatChangedName = socket.currentRoom.players[i];
-				playerThatChangedName.name = name;
-				playerThatChangedName.isInitialized = true;
-				socket.currentRoom.player[i] = playerThatChangedName;
 				break;
 			}
 		}
-		
+
 		if(playerThatChangedName !== undefined)
 		{
 			callback(true);
-			console.log('sdfdsf')
-			console.log(playerThatChangedName.name)
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
-				playerID:playerThatChangedName.playerID,
-				name:playerThatChangedName.name,
-				isInitialized:playerThatChangedName.isInitialized
+				playerID: playerThatChangedName.playerID,
+				name: name,
+				isInitialized: playerThatChangedName.isInitialized
 			});
 		}
 		else
