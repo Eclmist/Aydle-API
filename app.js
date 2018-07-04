@@ -273,11 +273,14 @@ function CreateDebugRoom(code)
 {
 	if(!RoomExist(code))
 	{
-    let createdRoom = RoomUtils.CreateRoom(code);
-    createdRoom.AddPlayer('dummy','dummy');
-    gamerooms[code] = createdRoom;
-    return true;
-  }
+    	let createdRoom = RoomUtils.CreateRoom(code);
+		createdRoom.AddPlayer('dummy','dummy');
+		let dummyPlayer = createdRoom.GetPlayerByPlayerID('dummy');
+		dummyPlayer.name = "dummy";
+		dummyPlayer.isInitialized = true;
+    	gamerooms[code] = createdRoom;
+    	return true;
+ 	}
   
   return false;
 }
