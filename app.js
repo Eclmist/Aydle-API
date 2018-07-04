@@ -144,11 +144,10 @@ io.sockets.on('connection', function(socket)
 					});
 
 					socket.currentRoom.RemovePlayer(oldPlayer.socketID);
-					socket.emit('test')
 				}
 				
 				let player = socket.currentRoom.GetPlayerBySocketID(socket.id);
-				
+				socket.emit('test')
 				
 				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
 						
