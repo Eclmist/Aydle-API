@@ -132,8 +132,9 @@ io.sockets.on('connection', function(socket)
 			
 				room.AddPlayer(socket.id,playerID);
 				socket.currentRoom = room;
-				socket.emit('test')
+				
 				successCallback(socket.currentRoom);
+				socket.emit('test')
 				
 				if(oldPlayer !== undefined)
 				{
