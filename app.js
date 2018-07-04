@@ -189,7 +189,6 @@ io.sockets.on('connection', function(socket)
 
 		
 		let player = gamerooms[code].GetPlayerBySocketID(socket.id);
-		console.log(gamerooms[code].players);
 		
 		if(player.isInitialized)
 			io.in(code).emit('onPeerUpdate', player);
@@ -295,13 +294,9 @@ io.sockets.on('connection', function(socket)
         // init game rules in the socket
         require('./games/' + gameName)(socket,io);
 	});
-//=============================== END Game Stuff =============================//
-
-
-//=============================== Debug Game =================================//
 
 	var targetNumber = -1
-	var timeleft = 30
+	var timeleft = 30.0
 	var gamerunning = false
 
 	socket.on('startDebugGame', () =>
@@ -315,9 +310,9 @@ io.sockets.on('connection', function(socket)
 				}
 			}
 		})
-		this.gamerunning = true
+		gamerunning = true
 		this.targetNumber = GetRandNumber(1, 10)
-		io.in(socket.currentRoom.code).emit('PassBomb', socket.currentRoom.GetNextTarget().playerID, this.timeleft, this.targetNumber)
+		io.in(socket.currentRoom.code).emit('PassBomb', socket.currentRoom.GetNextTarget().playerID, timeleft, this.targetNumber)
 	});
 
 	socket.on('pass', (time, number) =>
@@ -325,13 +320,13 @@ io.sockets.on('connection', function(socket)
 		if (number === this.targetNumber) {
 
 			let timer = time
-			if (timer + 5 < 30)
-			{
-				timer = 30
-			} else {
-				timer += 5
-			}
-			this.timeleft = timer
+			// if (timer + 5 < 30)
+			// {
+			// 	timer = 30
+			// } else {
+			// 	timer += 5
+			// }
+			timeleft = timer
 			this.targetNumber = GetRandNumber(1, 10)
 			io.in(socket.currentRoom.code).emit('PassBomb', socket.currentRoom.GetNextTarget().playerID, timer, this.targetNumber)
 		}
@@ -343,14 +338,14 @@ io.sockets.on('connection', function(socket)
 	});
 
 	setInterval(() => {
-		if (this.gamerunning === true) {
-
-			this.timeleft -= 0.033;
-			if (this.timeleft <= 0)
+		if (gamerunning === true) {
 			
-			io.in(socket.currentRoom.code).emit('explode')
-			this.gamerunning === false
-			this.timeleft = 30
+			timeleft -= 0.033;
+			if (timeleft <= 0) {		
+				io.in(socket.currentRoom.code).emit('explode')
+				this.gamerunning === false
+				timeleft = 30
+			}
 		}
 	}, 33)
 });
