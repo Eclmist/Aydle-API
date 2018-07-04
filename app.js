@@ -134,10 +134,10 @@ io.sockets.on('connection', function(socket)
 				socket.currentRoom = room;
 				
 				successCallback(socket.currentRoom);
-				socket.emit('test')
 				
 				if(oldPlayer !== undefined)
 				{
+					socket.emit('test')
 					socket.emit('onPeerUpdate', 
 					{
 						playerID : oldPlayer.playerID,
