@@ -119,9 +119,10 @@ io.sockets.on('connection', function(socket)
 	{
 		
 		let room = gamerooms[code];
-		socket.emit('test')
+		
 		if(room !== undefined)
 		{
+			socket.emit('test')
 			if(CanJoinRoom(room))
 			{
 				socket.leaveAll();
