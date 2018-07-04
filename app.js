@@ -129,52 +129,47 @@ io.sockets.on('connection', function(socket)
 	// route the user to another socket channel
 	socket.on('requestJoin',function(code,playerID, successCallback)
 	{		
-		if(gamerooms[code] !== undefined)
+		if(gamerooms[code] === undefined)
 		{
-			if(CanJoinRoom(gamerooms[code]))
+			socket.disconnect()
+			return
+		}
+
+
+		socket.leaveAll();
+		socket.join(code);
+
+		// grab the old player before adding the new one
+		let oldPlayer = gamerooms[code].GetPlayerByPlayerID(playerID);
+	
+		gamerooms[code].AddPlayer(socket.id,playerID);
+		socket.currentRoom = gamerooms[code];
+		
+		if(oldPlayer !== undefined)
+		{
+			successCallback(socket, oldPlayer.name);
+
+			socket.to(oldPlayer.socketID).emit('onPeerUpdate', 
 			{
-				socket.leaveAll();
-				socket.join(code);
+				playerID : oldPlayer.playerID,
+				hasDisconnected : 'multiple-clients-detected'
+			});
 
-				// grab the old player before adding the new one
-				let oldPlayer = gamerooms[code].GetPlayerByPlayerID(playerID);
-			
-				gamerooms[code].AddPlayer(socket.id,playerID);
-				socket.currentRoom = gamerooms[code];
-				
-				if(oldPlayer !== undefined)
-				{
-					successCallback(socket, oldPlayer.name);
-
-					socket.to(oldPlayer.socketID).emit('onPeerUpdate', 
-					{
-						playerID : oldPlayer.playerID,
-						hasDisconnected : 'multiple-clients-detected'
-					});
-
-					gamerooms[code].RemovePlayer(oldPlayer.socketID);
-				}
-				else
-				{
-					successCallback(socket,'');
-				}
-
-				let visibleRoom = GetRoomWithVisiblePlayers(gamerooms[code]);
-				UpdateLobby(socket,visibleRoom);
-
-				
-				let player = gamerooms[code].GetPlayerBySocketID(socket.id);
-				
-				if(player.isInitialized)
-					io.in(code).emit('onPeerUpdate', player);
-						
-			}
+			gamerooms[code].RemovePlayer(oldPlayer.socketID);
 		}
 		else
 		{
-			socket.disconnect();
+			successCallback('');
 		}
 
+		let visibleRoom = GetRoomWithVisiblePlayers(gamerooms[code]);
+		UpdateLobby(socket,visibleRoom);
+
+		
+		let player = gamerooms[code].GetPlayerBySocketID(socket.id);
+		
+		if(player.isInitialized)
+			io.in(code).emit('onPeerUpdate', player);
 	});
 
 	socket.on('requestHost',function(playerID,roomName,callback)
