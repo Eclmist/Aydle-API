@@ -311,8 +311,11 @@ function CreateDebugRoom(code)
     	let createdRoom = RoomUtils.CreateRoom(code);
 		createdRoom.AddPlayer('dummy','dummy');
 		let dummyPlayer = createdRoom.GetPlayerByPlayerID('dummy');
+		dummyPlayer.isHost = true;
 		dummyPlayer.name = "dummy";
 		dummyPlayer.isInitialized = true;
+		
+		createdRoom.GetPlayerByPlayerID('dummy') = dummyPlayer;
     	gamerooms[code] = createdRoom;
     	return true;
  	}
