@@ -251,7 +251,7 @@ io.sockets.on('connection', function(socket)
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
 				playerID: playerThatChangedName.playerID,
-				name: name,
+				name: 'a grown man',
 				isInitialized: playerThatChangedName.isInitialized
 			});
 		}
