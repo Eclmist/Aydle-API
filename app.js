@@ -147,7 +147,7 @@ io.sockets.on('connection', function(socket)
 		
 		if(oldPlayer !== undefined)
 		{
-			successCallback(socket, oldPlayer.name);
+			successCallback(oldPlayer.name);
 
 			socket.to(oldPlayer.socketID).emit('onPeerUpdate', 
 			{
@@ -251,7 +251,7 @@ io.sockets.on('connection', function(socket)
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
 				playerID: playerThatChangedName.playerID,
-				name: 'a grown man',
+				name: name,
 				isInitialized: playerThatChangedName.isInitialized
 			});
 		}
