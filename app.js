@@ -147,10 +147,10 @@ io.sockets.on('connection', function(socket)
 				}
 				
 				let player = socket.currentRoom.GetPlayerBySocketID(socket.id);
-				socket.emit('test')
 				
 				io.in(socket.currentRoom.code).emit('onPeerUpdate', player);
 						
+				socket.emit('test')
 			}
 		}
 		else
