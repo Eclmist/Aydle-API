@@ -314,7 +314,7 @@ function CreateDebugRoom(code)
 		dummyPlayer.isHost = true;
 		dummyPlayer.name = "dummy";
 		dummyPlayer.isInitialized = true;
-		
+
 		createdRoom.GetPlayerByPlayerID('dummy') = dummyPlayer;
     	gamerooms[code] = createdRoom;
     	return true;
@@ -378,7 +378,7 @@ function GetRoomWithVisiblePlayers(room)
 
 		for(let i = 0; i < room.players.length; i++)
 		{
-			if(room.players[i].isInitialized && !room.players[i].isAway)
+			if(!room.players[i].isAway)
 				visiblePlayers.push(room.players[i]);
 		}
 
