@@ -159,8 +159,8 @@ io.sockets.on('connection', function(socket)
 					successCallback(socket,'');
 				}
 
-				
-				//UpdateLobby(socket,GetRoomWithVisiblePlayers(gamerooms[code]));
+				let visibleRoom = GetRoomWithVisiblePlayers(gamerooms[code]);
+				UpdateLobby(socket,visibleRoom);
 
 				
 				let player = gamerooms[code].GetPlayerBySocketID(socket.id);
@@ -195,7 +195,9 @@ io.sockets.on('connection', function(socket)
 		// store the room object in the socket object	
 		socket.currentRoom = createdRoom;
 
-		callback(socket.currentRoom);
+		let visiblePlayersRoom = GetRoomWithVisiblePlayers(socket.currentRoom);
+
+		callback(visiblePlayersRoom);
 	});
 
 	socket.on('kickPlayer',function(roomCode,playerID)
@@ -222,7 +224,8 @@ io.sockets.on('connection', function(socket)
 		{
 			socket.currentRoom.name = name;
 			gamerooms[socket.currentRoom.code] = socket.currentRoom;
-			UpdateLobby(socket,GetRoomWithVisiblePlayers(gamerooms[socket.currentRoom.code]));
+			let visibleRoom = GetRoomWithVisiblePlayers(gamerooms[socket.currentRoom.code]);
+			UpdateLobby(socket,visibleRoom);
 			callback(true);
 		}
 		else
