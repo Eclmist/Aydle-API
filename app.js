@@ -148,26 +148,25 @@ io.sockets.on('connection', function(socket)
 		socket.leaveAll();
 		socket.join(code);
 
+		let room = gamerooms[code];
+
 		// grab the old player before adding the new one
-		let oldPlayer = gamerooms[code].GetPlayerByPlayerID(playerID);
-		socket.currentRoom = gamerooms[code];
+		let oldPlayer = room.GetPlayerByPlayerID(playerID);
+		socket.currentRoom = room;
 		
 		if(oldPlayer !== undefined)
 		{
 			let replacement = Object.assign({socketID:1,isAway:false},oldPlayer);
 			replacement.isAway = false;
 			replacement.socketID = socket.id;
-			
-			console.log('old ' + oldPlayer.socketID);
-			console.log('new ' + socket.id);
 
-			gamerooms[code].players.push(replacement);
+			room.players.push(replacement);
 			io.sockets.connected[oldPlayer.socketID].disconnect();
-			gamerooms[code].RemovePlayer(oldPlayer.socketID);
+			room.RemovePlayer(oldPlayer.socketID);
 
-			if(gamerooms[code].players.length > 1)
+			if(room.players.length > 1)
 			{
-				gamerooms[code].GetPlayerBySocketID(socket.id).isHost = false;
+				room.GetPlayerBySocketID(socket.id).isHost = false;
 			}
 
 			successCallback(oldPlayer.name);
@@ -180,15 +179,15 @@ io.sockets.on('connection', function(socket)
 		}
 		else
 		{
-			gamerooms[code].AddPlayer(socket.id,playerID);
+			room.AddPlayer(socket.id,playerID);
 			successCallback('');
 		}
 
-		let visibleRoom = GetRoomWithVisiblePlayers(gamerooms[code]);
+		let visibleRoom = GetRoomWithVisiblePlayers(room);
 		UpdateLobby(socket,visibleRoom);
 
 		
-		let player = gamerooms[code].GetPlayerBySocketID(socket.id);
+		let player = room.GetPlayerBySocketID(socket.id);
 		
 		if(player.isInitialized)
 			io.in(code).emit('onPeerUpdate', player);
@@ -210,10 +209,9 @@ io.sockets.on('connection', function(socket)
 		createdRoom.AddPlayer(socket.id,playerID);
 		createdRoom.GetPlayerBySocketID(socket.id).isHost = true;
 		gamerooms[generatedCode] = createdRoom;
-		// store the room object in the socket object	
 		socket.currentRoom = createdRoom;
 
-		let visiblePlayersRoom = GetRoomWithVisiblePlayers(socket.currentRoom);
+		let visiblePlayersRoom = GetRoomWithVisiblePlayers(createdRoom);
 
 		callback(visiblePlayersRoom);
 		UpdateLobby(socket,visiblePlayersRoom);
@@ -239,11 +237,12 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('setLobbyName',function(name, callback)
 	{
-		if(socket.currentRoom !== undefined)
+		let room  = socket.currentRoom;
+
+		if(room !== undefined)
 		{
-			socket.currentRoom.name = name;
-			gamerooms[socket.currentRoom.code] = socket.currentRoom;
-			let visibleRoom = GetRoomWithVisiblePlayers(gamerooms[socket.currentRoom.code]);
+			room.name = name;
+			let visibleRoom = GetRoomWithVisiblePlayers(room);
 			UpdateLobby(socket,visibleRoom);
 			callback(true);
 		}
@@ -256,14 +255,15 @@ io.sockets.on('connection', function(socket)
 	socket.on('setName',function(name, callback)
 	{
 		let playerThatChangedName;
+		let room = socket.currentRoom;
 
-		for(let i = 0; i < socket.currentRoom.players.length; i++)
+		for(let i = 0; i < room.players.length; i++)
 		{
-			if(socket.currentRoom.players[i].socketID === socket.id)
+			if(room.players[i].socketID === socket.id)
 			{
-				socket.currentRoom.players[i].name = name;
-				socket.currentRoom.players[i].isInitialized = true;
-				playerThatChangedName = socket.currentRoom.players[i];
+				room.players[i].name = name;
+				room.players[i].isInitialized = true;
+				playerThatChangedName = room.players[i];
 				break;
 			}
 		}
@@ -271,7 +271,7 @@ io.sockets.on('connection', function(socket)
 		if(playerThatChangedName !== undefined)
 		{
 			callback(true);
-			io.in(socket.currentRoom.code).emit('onPeerUpdate',
+			io.in(room.code).emit('onPeerUpdate',
 			{
 				playerID: playerThatChangedName.playerID,
 				name: name,
@@ -485,10 +485,11 @@ function GenerateUniqueCode(codeCount)
 function CheckRoomIsAway(code)
 {
 	let isActive = false;
+	let room = gamerooms[code];
 
-	for(let i = 0; i < gamerooms[code].players.length; i++)
+	for(let i = 0; i < room.players.length; i++)
 	{
-		if(!gamerooms[code].players[i].isAway)
+		if(!room.players[i].isAway)
 		{
 			isActive = true;
 			break;
