@@ -118,7 +118,6 @@ io.sockets.on('connection', function(socket)
 			{
 				player.isHost = false;
 				socket.currentRoom.AppointNewHost();
-				gamerooms[socket.currentRoom.code] = socket.currentRoom;
 				let host = socket.currentRoom.GetHost();
 
 				if (host !== undefined) {
@@ -168,10 +167,7 @@ io.sockets.on('connection', function(socket)
 
 			room.RemovePlayer(oldPlayer.socketID);
 
-			if(room.players.length > 1)
-			{
-				room.GetPlayerBySocketID(socket.id).isHost = false;
-			}
+			room.AppointNewHost(); 
 
 			successCallback(oldPlayer.name);
 
