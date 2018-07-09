@@ -208,12 +208,11 @@ io.sockets.on('connection', function(socket)
 		socket.join(generatedCode);
 		
 		// create the room object
-		let createdRoom = RoomUtils.CreateRoom(generatedCode);
+		let createdRoom = CreateAndStoreRoom(generatedCode,socket);
 		createdRoom.name = roomName;
-		createdRoom.AddPlayer(socket.id,playerID);
-		createdRoom.GetPlayerBySocketID(socket.id).isHost = true;
-		gamerooms[generatedCode] = createdRoom;
-		socket.currentRoom = createdRoom;
+
+		let player = createdRoom.AddPlayer(socket.id,playerID);
+		player.isHost = true;
 
 		let visiblePlayersRoom = GetRoomWithVisiblePlayers(createdRoom);
 
@@ -361,10 +360,15 @@ function GetRandNumber(max, min) //both inclusive
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function CreateAndStoreRoom(code)
+// Creates the room object and stores it in both the socket and in global gamerooms var
+function CreateAndStoreRoom(code,socket)
 {
 	let createdRoom = RoomUtils.CreateRoom(code);
 	gamerooms[code] = createdRoom;
+
+	if(socket !== undefined) // may be a dummy
+		socket.currentRoom = createdRoom;
+
 	return createdRoom;
 }
 
