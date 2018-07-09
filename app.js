@@ -415,38 +415,6 @@ function DeleteDummyRooms()
 		});
 }
 
-
-
-// returns the code for the room that the player joined
-function GetRoomUserIsIn(id)
-{
-	let userRooms = GetRoomsByUser(id);
-
-	if(userRooms.length > 0)
-		return userRooms[0];
-	else
-		return null;
-
-}
-
-function GetRoomsByUser(id)
-{
-    let usersRooms = [];
-    let rooms = io.sockets.adapter.rooms;
-
-    for(let room in rooms)
-    {
-        if(rooms.hasOwnProperty(room))
-        {
-            let sockets = rooms[room].sockets;
-            if(id in sockets)
-                usersRooms.push(room);          
-        }
-    }
-
-    return usersRooms;	
-}
-
 function GetRoomWithVisiblePlayers(room)
 {
 
