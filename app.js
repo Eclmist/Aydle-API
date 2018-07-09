@@ -257,11 +257,13 @@ io.sockets.on('connection', function(socket)
 		let playerThatChangedName;
 		let room = socket.currentRoom;
 
+		let uniqueName = MakeNameUnique(name, 0, room.players);
+
 		for(let i = 0; i < room.players.length; i++)
 		{
 			if(room.players[i].socketID === socket.id)
 			{
-				room.players[i].name = name;
+				room.players[i].name = uniqueName;
 				room.players[i].isInitialized = true;
 				playerThatChangedName = room.players[i];
 				break;
@@ -274,7 +276,7 @@ io.sockets.on('connection', function(socket)
 			io.in(room.code).emit('onPeerUpdate',
 			{
 				playerID: playerThatChangedName.playerID,
-				name: name,
+				name: playerThatChangedName.name,
 				isInitialized: playerThatChangedName.isInitialized
 			});
 		}
@@ -522,6 +524,41 @@ function CheckForEmptyRooms()
 	}
 }
 
+function MakeNameUnique(name,counter,players)
+{
+    let count = counter;
+    let originalName = name
+    let pendingName;
+    let exist = false;
+            
+    if( count !== 0)
+        pendingName = name + " - " + count;
+    else
+    	pendingName = name;
+
+    for(let i = 0; i <players.length; i++)
+    {
+
+        if(pendingName === players[i].name)
+        {
+            exist = true;
+        	break;
+        }
+    }
+
+    if(exist === true)
+    {
+        count++;
+        return MakeNameUnique(originalName,count,players);
+    }
+    else
+    {
+        if(count !== 0)
+            return  pendingName;
+        else
+            return originalName;
+    }   
+}
 
 
 function GetShortenedGameList()
