@@ -161,7 +161,11 @@ io.sockets.on('connection', function(socket)
 			replacement.socketID = socket.id;
 
 			room.players.push(replacement);
-			io.sockets.connected[oldPlayer.socketID].disconnect();
+			let oldSocket = io.sockets.connected[oldPlayer.socketID];
+
+			if(oldSocket !== undefined)
+				oldSocket.disconnect();
+				
 			room.RemovePlayer(oldPlayer.socketID);
 
 			if(room.players.length > 1)
@@ -357,6 +361,13 @@ function GetRandNumber(max, min) //both inclusive
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function CreateAndStoreRoom(code)
+{
+	let createdRoom = RoomUtils.CreateRoom(code);
+	gamerooms[code] = createdRoom;
+	return createdRoom;
+}
+
 function RoomExist(code)
 {
   return gamerooms[code] !== undefined;
@@ -376,15 +387,13 @@ function CreateDebugRoom(code)
 {
 	if(!RoomExist(code))
 	{
-    	let createdRoom = RoomUtils.CreateRoom(code);
-		createdRoom.AddPlayer('dummy','dummy');
-		let dummyPlayer = createdRoom.GetPlayerByPlayerID('dummy');
+    	let createdRoom = CreateAndStoreRoom(code);
+		let dummyPlayer = createdRoom.AddPlayer('dummy','dummy');
+		
 		dummyPlayer.isHost = true;
 		dummyPlayer.name = "dummy";
 		dummyPlayer.isInitialized = true;
 
-		createdRoom.GetPlayerByPlayerID('dummy') = dummyPlayer;
-    	gamerooms[code] = createdRoom;
     	return true;
  	}
   
