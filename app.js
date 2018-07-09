@@ -165,7 +165,7 @@ io.sockets.on('connection', function(socket)
 
 			if(oldSocket !== undefined)
 				oldSocket.disconnect();
-				
+
 			room.RemovePlayer(oldPlayer.socketID);
 
 			if(room.players.length > 1)
@@ -260,8 +260,8 @@ io.sockets.on('connection', function(socket)
 	{
 		let playerThatChangedName;
 		let room = socket.currentRoom;
-
-		let uniqueName = MakeNameUnique(name, 0, room.players);
+		console.log("there are " + room.players.length);
+		let uniqueName = MakeNameUnique(name, 0, room.players,socket.id);
 
 		for(let i = 0; i < room.players.length; i++)
 		{
@@ -533,7 +533,7 @@ function CheckForEmptyRooms()
 	}
 }
 
-function MakeNameUnique(name,counter,players)
+function MakeNameUnique(name,counter,players,excludeSocketID)
 {
     let count = counter;
     let originalName = name
@@ -547,18 +547,22 @@ function MakeNameUnique(name,counter,players)
 
     for(let i = 0; i <players.length; i++)
     {
-
-        if(pendingName === players[i].name)
-        {
-            exist = true;
-        	break;
-        }
+		// skip self if reconnecting as same player
+		if(!players[i].isAway && players[i].socketID !== excludeSocketID)
+		{
+			if(pendingName === players[i].name)
+        	{
+            	exist = true;
+        		break;
+        	}
+		}
+		
     }
 
     if(exist === true)
     {
         count++;
-        return MakeNameUnique(originalName,count,players);
+        return MakeNameUnique(originalName,count,players,excludeSocketID);
     }
     else
     {
