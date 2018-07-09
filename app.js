@@ -104,31 +104,24 @@ io.sockets.on('connection', function(socket)
 		if('currentRoom' in socket)
 		{
 			let player = socket.currentRoom.GetPlayerBySocketID(socket.id);
-			player.isAway = true;
-			//socket.currentRoom.RemovePlayer(socket.id);
-			//CheckForEmptyRooms();
-		
+			socket.currentRoom.OnDisconnecting(socket.id);
+
 			io.in(socket.currentRoom.code).emit('onPeerUpdate',
 			{
 				playerID : player.playerID,
 				hasDisconnected : 'user-left'
 			});
+			
+			let host = socket.currentRoom.GetHost();
 
-			if(player.isHost)
-			{
-				player.isHost = false;
-				socket.currentRoom.AppointNewHost();
-				let host = socket.currentRoom.GetHost();
-
-				if (host !== undefined) {
-					io.in(socket.currentRoom.code).emit('onPeerUpdate',
-					{
-						playerID : host.playerID,
-						isHost : host.isHost
-					});
-				}
-			}			
-
+			if (host !== undefined) {
+				io.in(socket.currentRoom.code).emit('onPeerUpdate',
+				{
+					playerID : host.playerID,
+					isHost : host.isHost
+				});
+			}
+					
 			CheckRoomIsAway(socket.currentRoom.code);
 		}
 	});
@@ -155,19 +148,17 @@ io.sockets.on('connection', function(socket)
 		
 		if(oldPlayer !== undefined)
 		{
+			// create a player copy with different socketID and away status
 			let replacement = Object.assign({socketID:1,isAway:false},oldPlayer);
 			replacement.isAway = false;
 			replacement.socketID = socket.id;
-
 			room.players.push(replacement);
-			let oldSocket = io.sockets.connected[oldPlayer.socketID];
 
+			let oldSocket = io.sockets.connected[oldPlayer.socketID];
 			if(oldSocket !== undefined)
 				oldSocket.disconnect();
 
 			room.RemovePlayer(oldPlayer.socketID);
-
-			room.AppointNewHost(); 
 
 			successCallback(oldPlayer.name);
 
