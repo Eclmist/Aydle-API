@@ -99,6 +99,7 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('disconnecting',function(reason)
 	{
+		console.log('disconnecting...');
 		// check for room property
 		// socket may not have the room object attached if disconnect fires upon join/host failure
 		if('currentRoom' in socket)
