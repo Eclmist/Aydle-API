@@ -295,9 +295,7 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('joinGame', function(gameID)
 	{
-		let gameName = GameUtils.GetGameModuleName(gameID);
-        // init game rules in the socket
-        require('./games/' + gameName)(socket,io);
+		GameUtils.StartGameInstance(gameID,socket,io);
 	});
 
 	var targetNumber = -1
