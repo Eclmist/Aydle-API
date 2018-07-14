@@ -74,18 +74,10 @@ serv.listen(process.env.PORT || 2000);
 // require modules
 var RoomUtils = require('server/RoomUtils');
 var GameUtils = require('server/GameUtils');
-/*
-GameUtils.StartGameInstance(0,1);
-GameUtils.StartGameInstance(0,2);
-GameUtils.StartGameInstance(0,3);
-GameUtils.StartGameInstance(0,4);
-GameUtils.StartGameInstance(0,5);
-GameUtils.StartGameInstance(0,6);
-GameUtils.StartGameInstance(0,7);
-GameUtils.StartGameInstance(0,8);
-GameUtils.StartGameInstance(0,9);
-GameUtils.StartGameInstance(0,10);
-*/
+
+//GameUtils.StartGameInstance("debug/pass-the-bomb",1);
+
+
 
 // store a reference to all game rooms so we can access it without the socket's reference
 var gamerooms = {};
