@@ -75,7 +75,9 @@ serv.listen(process.env.PORT || 2000);
 var RoomUtils = require('server/RoomUtils');
 var GameUtils = require('server/GameUtils');
 
-//GameUtils.StartGameInstance("37251161");
+//GameUtils.StartGameInstance("66824994",1,1);
+
+
 
 
 
